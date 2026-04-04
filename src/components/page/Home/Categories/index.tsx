@@ -94,17 +94,21 @@ const CategoryRow = ({
         </Link>
       </div>
 
-      {/* Course pills row — spread to fill width */}
-      <div className="flex items-end justify-between w-full pb-4">
-        {courses.map((course, idx) => {
-          const isActive = idx === activeIndex;
-          const pillColor = PILL_COLORS[idx % PILL_COLORS.length];
+      <div className="relative">
+        <div
+          className="absolute -bottom-4 left-[-20px] right-[-20px] h-[50px] bg-white/5 rounded-[20px] pointer-events-none overflow-visible z-50"
+        />
+        {/* Course pills row — spread to fill width */}
+        <div className="flex items-end justify-between w-full pb-4">
+          {courses.map((course, idx) => {
+            const isActive = idx === activeIndex;
+            const pillColor = PILL_COLORS[idx % PILL_COLORS.length];
 
-          if (isActive) {
-            return (
-              <div key={idx} className="flex items-end shrink-0">
-                <div
-                  className={`
+            if (isActive) {
+              return (
+                <div key={idx} className="flex items-end shrink-0">
+                  <div
+                    className={`
                     relative flex flex-col sm:flex-row items-stretch
                     bg-wenza-card rounded-[12px] border ${accentClass}
                     shadow-wenza
@@ -112,59 +116,59 @@ const CategoryRow = ({
                     w-[260px] sm:w-[340px] md:w-[400px]
                     animate-expand-in
                   `}
-                >
-                  {/* Course thumbnail */}
-                  <div className={`
+                  >
+                    {/* Course thumbnail */}
+                    <div className={`
                     w-full sm:w-[150px] h-[130px] sm:h-[200px] shrink-0
                     ${pillColor} flex flex-col items-center justify-center p-4
                   `}>
-                    <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mb-2">
-                      <svg className="w-6 h-6 text-white/90" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                      </svg>
-                    </div>
-                    <span className="text-white text-[10px] font-bold uppercase tracking-wider text-center leading-tight">{course.title}</span>
-                  </div>
-
-                  {/* Course details */}
-                  <div className="flex flex-col justify-center p-4 flex-1">
-                    <h4 className="text-[14px] md:text-[15px] font-bold text-wenza-brown leading-snug mb-1">
-                      {course.title}
-                    </h4>
-                    <p className="text-[11px] md:text-[12px] text-wenza-muted leading-relaxed mb-2.5 line-clamp-3">
-                      {course.desc}
-                    </p>
-
-                    {/* Rating + Price */}
-                    <div className="flex items-center gap-2.5 mb-2.5">
-                      <div className="flex items-center gap-0.5">
-                        {[...Array(5)].map((_, i) => (
-                          <FaStar key={i} className="text-wenza-gold text-[11px]" />
-                        ))}
+                      <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mb-2">
+                        <svg className="w-6 h-6 text-white/90" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                        </svg>
                       </div>
-                      <span className={`text-[13px] font-bold ${course.free ? 'text-wenza-success' : 'text-wenza-brown'}`}>
-                        {course.price}
-                      </span>
+                      <span className="text-white text-[10px] font-bold uppercase tracking-wider text-center leading-tight">{course.title}</span>
                     </div>
 
-                    {/* Explore button */}
-                    <Link
-                      href="/courses"
-                      className="inline-flex items-center justify-center border border-wenza-primary text-wenza-primary rounded-[8px] px-4 py-1 text-[12px] font-bold uppercase tracking-wider hover:bg-wenza-primary hover:text-white transition-all duration-300"
-                    >
-                      EXPLORE
-                    </Link>
+                    {/* Course details */}
+                    <div className="flex flex-col justify-center p-4 flex-1">
+                      <h4 className="text-[14px] md:text-[15px] font-bold text-wenza-brown leading-snug mb-1">
+                        {course.title}
+                      </h4>
+                      <p className="text-[11px] md:text-[12px] text-wenza-muted leading-relaxed mb-2.5 line-clamp-3">
+                        {course.desc}
+                      </p>
+
+                      {/* Rating + Price */}
+                      <div className="flex items-center gap-2.5 mb-2.5">
+                        <div className="flex items-center gap-0.5">
+                          {[...Array(5)].map((_, i) => (
+                            <FaStar key={i} className="text-wenza-gold text-[11px]" />
+                          ))}
+                        </div>
+                        <span className={`text-[13px] font-bold ${course.free ? 'text-wenza-success' : 'text-wenza-brown'}`}>
+                          {course.price}
+                        </span>
+                      </div>
+
+                      {/* Explore button */}
+                      <Link
+                        href="/courses"
+                        className="inline-flex items-center justify-center border border-wenza-primary text-wenza-primary rounded-[8px] px-4 py-1 text-[12px] font-bold uppercase tracking-wider hover:bg-wenza-primary hover:text-white transition-all duration-300"
+                      >
+                        EXPLORE
+                      </Link>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          }
+              );
+            }
 
-          return (
-            <button
-              key={idx}
-              onClick={() => onPillClick(idx)}
-              className={`
+            return (
+              <button
+                key={idx}
+                onClick={() => onPillClick(idx)}
+                className={`
                 relative w-[48px] md:w-[56px] lg:w-[64px] h-[150px] md:h-[180px] lg:h-[200px] rounded-[14px] ml-14
                 ${pillColor} cursor-pointer
                 border-[3px] border-white shadow-[2px_4px_12px_rgba(0,0,0,0.12)]
@@ -172,17 +176,18 @@ const CategoryRow = ({
                 transition-all duration-300 ease-out
                 flex items-center justify-center shrink-0
               `}
-              style={{ transform: 'rotate(-12deg)', transformOrigin: 'bottom center' }}
-            >
-              <span
-                className="text-white text-[10px] md:text-[11px] lg:text-[12px] font-semibold whitespace-nowrap tracking-wide drop-shadow-sm"
-                style={{ writingMode: 'vertical-rl', textOrientation: 'mixed', transform: 'rotate(180deg)' }}
+                style={{ transform: 'rotate(-12deg)', transformOrigin: 'bottom center' }}
               >
-                {course.title}
-              </span>
-            </button>
-          );
-        })}
+                <span
+                  className="text-white text-[10px] md:text-[11px] lg:text-[12px] font-semibold whitespace-nowrap tracking-wide drop-shadow-sm"
+                  style={{ writingMode: 'vertical-rl', textOrientation: 'mixed', transform: 'rotate(180deg)' }}
+                >
+                  {course.title}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
