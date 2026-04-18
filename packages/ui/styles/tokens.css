@@ -1,0 +1,39 @@
+:root {
+  /* ─── Brand ─────────────────────────────────────────────────────── */
+  --color-primary: #B05010;
+  --color-primary-hover: #8B3E0D;
+  --color-secondary: #A05020;
+  --color-accent-gold: #C8882B;
+  --color-gold: #D0A050;
+
+  /* ─── Surfaces ───────────────────────────────────────────────────── */
+  --color-bg-page: #FDF6ED;
+  --color-bg-card: #FFF9F2;
+  --color-bg-dark: #1A1008;
+  --color-bg-deep-brown: #3D2010;
+
+  /* ─── Text ───────────────────────────────────────────────────────── */
+  --color-text-heading: #3D2010;
+  --color-text-body: #6B4025;
+  --color-text-muted: #8C7A68;
+  --color-text-on-dark: #FFFFFF;
+
+  /* ─── Lines ──────────────────────────────────────────────────────── */
+  --color-border: #E8D5C0;
+
+  /* ─── Status ─────────────────────────────────────────────────────── */
+  --color-success: #2D8B4E;
+  --color-error: #C43D2E;
+
+  /* ─── Radii ──────────────────────────────────────────────────────── */
+  --radius-card: 12px;
+  --radius-button: 8px;
+  --radius-pill: 100px;
+
+  /* ─── Shadows ────────────────────────────────────────────────────── */
+  --shadow-card: 0 4px 16px rgba(26, 16, 8, 0.08);
+
+  /* ─── Typography ─────────────────────────────────────────────────── */
+  --font-heading: 'Urbanist', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+}

@@ -1,0 +1,38 @@
+{
+  "name": "@wenza/ui",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./styles/tokens.css": "./styles/tokens.css",
+    "./tailwind/preset": "./tailwind/preset.ts",
+    "./fonts": "./fonts.ts",
+    "./lib/format": "./lib/format.ts"
+  },
+  "scripts": {
+    "lint": "eslint . --ext .ts,.tsx",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "next": "^14.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@wenza/eslint-config": "workspace:*",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.0.0",
+    "framer-motion": "^11.0.0",
+    "lucide-react": "^0.400.0",
+    "tailwind-merge": "^2.0.0"
+  }
+}

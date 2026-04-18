@@ -1,0 +1,1 @@
+module.exports = require('@wenza/eslint-config/prettier-preset');

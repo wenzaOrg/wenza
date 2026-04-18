@@ -1,0 +1,20 @@
+{
+  "name": "@wenza/eslint-config",
+  "version": "0.0.1",
+  "private": true,
+  "main": "eslint-preset.js",
+  "files": [
+    "eslint-preset.js",
+    "prettier-preset.js",
+    "tsconfig.base.json"
+  ],
+  "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.58.2",
+    "@typescript-eslint/parser": "^8.58.2",
+    "eslint-config-next": "14.2.0",
+    "eslint-config-prettier": "^10.1.8"
+  },
+  "scripts": {
+    "typecheck": "echo 'no types to check'"
+  }
+}

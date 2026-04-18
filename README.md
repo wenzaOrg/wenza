@@ -1,1146 +1,1106 @@
-# WENZA — Complete Multi-Page Figma Make Prompt Guide
-## Build a Tech E-Learning Platform with Live Mentorship, Certificates & Community
+# wenza
+
+> **Wenza Frontend** — Next.js 14 monorepo serving the Wenza marketing site, student LMS, certificate verification portal, and scholarship funnel.
+
+This is the TypeScript frontend for [Wenza](https://wenza.com). It consumes the Laravel API at `api.wenza.com/api/v1` and ships four distinct subdomain experiences from a single codebase.
+
+For project vision, brand, and the backend repo, see the [root README](../README.md).
+For the API this frontend consumes, see [`wenza-api`](../wenza-api/README.md).
 
 ---
 
-## WHAT WENZA IS
+## Table of Contents
 
-**Wenza** is a Nigerian tech e-learning platform that teaches individuals tech skills. Wenza is **NOT** a marketplace — Wenza creates all of its own courses and content in-house.
-
-**What Wenza offers:**
-1. **Expert-built tech courses** — Created by Wenza's team. Structured, project-based courses covering programming, web development, mobile development, and data science/AI.
-2. **Live 1-on-1 mentorship** — Learners book private sessions with Wenza's senior developers for code reviews, career advice, debugging help, or guided learning.
-3. **Certificates of completion** — Verified digital certificates for every completed course.
-4. **Developer community** — Forums, study groups, coding challenges, and peer code reviews.
-
-**Topics covered:**
-- Programming (Python, JavaScript, TypeScript, etc.)
-- Web Development (Frontend, Backend, Full-Stack — React, Next.js, Node.js, etc.)
-- Mobile App Development (Flutter, React Native)
-- Data Science & AI/Machine Learning
-
-**Who it's for:** Nigerian individuals who want to learn tech — career changers, university students, working professionals upskilling, and complete beginners.
-
-**What makes Wenza different:**
-- Wenza creates all its own courses (not a marketplace — no instructor uploads)
-- Affordable Naira pricing
-- Live 1-on-1 mentorship with senior developers
-- Works offline / low data — designed for Nigerian network conditions
-- Community features — study groups, forums, coding challenges
+1. [Stack](#1-stack)
+2. [Local Setup](#2-local-setup)
+3. [Monorepo Structure](#3-monorepo-structure)
+4. [Design Tokens](#4-design-tokens)
+5. [Typography](#5-typography)
+6. [Component Conventions](#6-component-conventions)
+7. [The `useRequest` Data Layer](#7-the-userequest-data-layer)
+8. [API Response Contract](#8-api-response-contract)
+9. [Auth Flow](#9-auth-flow)
+10. [Subdomain Routing](#10-subdomain-routing)
+11. [Sitemap](#11-sitemap)
+12. [Course Detail Pages](#12-course-detail-pages)
+13. [Certificate Portal](#13-certificate-portal)
+14. [Component Inventory](#14-component-inventory)
+15. [Accessibility](#15-accessibility)
+16. [SEO](#16-seo)
+17. [Testing](#17-testing)
+18. [Deployment](#18-deployment)
+19. [Environment Variables](#19-environment-variables)
+20. [Conventions & Code Style](#20-conventions--code-style)
 
 ---
 
-## PAGE STRUCTURE
+## 1. Stack
 
-| # | Page Name | Purpose |
-|---|-----------|---------|
-| 1 | **Home / Landing** | Hero, three pillars (courses + mentorship + community), categories, featured courses, mentors, testimonials, CTA |
-| 2 | **Courses Listing** | Browse/search/filter all tech courses |
-| 3 | **Course Detail** | Single course — syllabus, projects, mentorship info, reviews, enroll |
-| 4 | **Mentorship** | Browse Wenza's mentors, how mentorship works, pricing |
-| 5 | **Community** | Forums, study groups, coding challenges |
-| 6 | **About Us** | Wenza's story, mission, team, stats |
-| 7 | **Pricing** | Free / Per Course / Unlimited plans + mentorship add-ons |
-| 8 | **Contact** | Contact form, support info |
-| 9 | **Sign Up / Login** | Account creation and login |
-| 10 | **Student Dashboard** | Enrolled courses, upcoming mentorship sessions, progress, certificates |
-| 11 | **Design System** | Components, colors, fonts, tokens (internal reference) |
-
----
-
-## HOW TO WORK IN FIGMA
-
-### Option A: Using Figma Design (Recommended)
-1. Duplicate the "E-Learning Site" community template into your drafts
-2. Rename it "Wenza — Tech E-Learning Platform"
-3. Create a new Figma page for each page listed above
-4. Use the prompts below — one per page
-5. After all pages are done, switch to Prototype mode and wire all navigation links between pages
-
-### Option B: Using Figma Make
-1. Create a separate Figma Make file per page (Make is single-page by default)
-2. Name each: "Wenza — Home", "Wenza — Courses", "Wenza — Mentorship", etc.
-3. Paste the matching prompt, review, adjust
-4. When all pages are ready, copy frames from each Make file into one Figma Design file
-5. Wire prototype connections in Prototype mode
-
-### Rule: One prompt per page. Build each page separately, then connect them.
+| Layer | Choice |
+|---|---|
+| Framework | Next.js 14 (App Router, Server Components) |
+| Language | TypeScript (strict mode) |
+| Monorepo | Turborepo + pnpm workspaces |
+| Styling | Tailwind CSS + CSS variables |
+| UI Primitives | shadcn/ui (Radix under the hood) |
+| Animation | Framer Motion |
+| Forms | React Hook Form + Zod |
+| Data Fetching | SWR via custom `useRequest` hook + Axios |
+| State | Redux Toolkit + redux-persist (auth + global UI state only) |
+| Notifications | sonner |
+| Icons | Lucide React |
+| Testing | Vitest + React Testing Library + Playwright |
+| Linting | ESLint + Prettier |
+| Deployment | Vercel |
 
 ---
 
-## BRAND CONTEXT — Paste at the Start of Your First Prompt
+## 2. Local Setup
 
-```
-BRAND CONTEXT FOR ALL PAGES:
+### Prerequisites
 
-Brand: Wenza
-What it is: A Nigerian tech e-learning platform. Wenza creates all of its own courses — it is NOT a marketplace. Wenza teaches programming, web development, mobile development, and data science/AI to Nigerian individuals.
-Features: Expert-built courses, live 1-on-1 mentorship with senior developers, certificates of completion, and a developer community (forums, study groups, coding challenges).
-Tagline: "Master Tech Skills. Build Real Projects. Get Mentored."
-Logo: Africa continent silhouette with flowing circuit-line patterns in burnt orange, amber, and deep brown.
-Currency: Nigerian Naira (₦)
-Target audience: Nigerians who want to learn tech — beginners, career changers, university students, working professionals.
-Key differentiators: Wenza creates all its own content (not a marketplace), affordable Naira pricing, live mentorship with senior devs, works offline / low data, developer community.
+- Node.js 20+
+- pnpm 9+
+- The Laravel API running locally at `http://127.0.0.1:8000` (see [`../wenza-api/README.md`](../wenza-api/README.md))
 
-COLOR SYSTEM:
-- Primary: #B05010 (burnt orange — buttons, links, CTAs)
-- Primary Hover: #8B3E0D (darker orange)
-- Secondary: #A05020 (deep burnt orange)
-- Gold/Amber: #D0A050 (stars, badges, highlights)
-- Dark Background: #1A1008 (footer, dark sections)
-- Deep Brown: #3D2010 (headings, dark section BGs)
-- Body Text: #6B4025 (paragraphs)
-- Page Background: #FDF6ED (warm off-white)
-- Card Background: #FFF9F2 (warm white)
-- Border: #E8D5C0 (dividers, card borders)
-- Muted Text: #8C7A68 (captions, placeholders)
-- Success: #2D8B4E
-- Error: #C43D2E
-- White: #FFFFFF
+### Steps
 
-TYPOGRAPHY:
-- Headings: "Lora" Bold (serif)
-- Body/UI: "DM Sans" Regular/Medium/SemiBold
+```bash
+# Clone
+git clone https://github.com/<org>/wenza.git
+cd wenza
 
-DESIGN RULES:
-- Card radius: 12px | Button radius: 8px | Pill/badge radius: 100px
-- Card shadow: 0 4px 16px rgba(26,16,8,0.08)
-- Min touch target: 44px on mobile
-- All prices in ₦ (Naira)
-- All courses say "Created by Wenza Team" — never individual instructor names
-- No marketplace language (no "list your course", "set your price", "earn on Wenza")
-- No exam prep content (no WAEC, JAMB, NECO)
+# Install
+pnpm install
+
+# Environment
+cp .env.example .env.local
+# Edit .env.local — point NEXT_PUBLIC_API_URL at http://127.0.0.1:8000/api/v1
+
+# Run all four apps in parallel
+pnpm dev
 ```
 
----
+After `pnpm dev`, the four apps are available at:
 
-## PAGE 1 — HOME / LANDING PAGE
-
-```
-Imagine you are a senior product designer building the homepage for Wenza, a Nigerian tech e-learning platform. Wenza is NOT a marketplace — it creates all of its own courses in-house. This is one page in a multipage website. The homepage must communicate three things: expert-built tech courses, live 1-on-1 mentorship, and a developer community.
-
-Build the complete homepage with these sections top to bottom:
-
---- SECTION 1: NAVIGATION BAR (reused on every page) ---
-Fixed top, 64px height, bg #FFFFFF, bottom border 1px #E8D5C0.
-Left: "Wenza" in Lora Bold 24px #3D2010.
-Center: nav links — "Home" (active, #B05010 with 2px bottom border), "Courses", "Mentorship", "Community", "Pricing", "About" — DM Sans Medium 15px #6B4025, 28px spacing, hover #B05010.
-Right: "Log In" text link in outline style + "Start Learning" button bg #B05010 text #FFFFFF h:40px radius 8px hover #8B3E0D.
-Mobile (<768px): hamburger menu, vertical dropdown bg #FDF6ED, 48px link height, full-width "Start Learning" button at bottom.
-
---- SECTION 2: HERO ---
-Full-width, min-height 560px, bg gradient #1A1008 → #3D2010.
-Left (55%):
-- Badge: "🇳🇬 Nigeria's Tech Learning Platform" — pill, border #D0A050, text #D0A050, DM Sans 13px
-- Headline: "Master Tech Skills. Build Real Projects. Get Mentored." — Lora Bold 48px #FFFFFF, max-width 540px
-- Sub: "Learn programming, web development, mobile apps, data science, and AI with Wenza. Expert-created courses, live 1-on-1 mentorship, and a community of Nigerian developers who've got your back." — DM Sans 17px #E8D5C0, max-width 480px
-- Three buttons row, 12px gaps:
-  - "Explore Courses" — bg #B05010, text #FFFFFF, h:48px, radius 8px
-  - "Book a Mentor" — outline, border #D0A050, text #D0A050
-  - "Join Community" — outline, border #E8D5C0, text #E8D5C0
-- Trust line: "10,000+ Learners • 200+ Courses • 50+ Mentors • Prices from ₦3,500" — DM Sans 14px #8C7A68
-Right (45%): A code editor mockup showing a Python snippet — dark rounded rectangle with syntax-highlighted code. Small floating card at bottom-right: "Live Mentorship • In Session" with green dot indicator.
-Mobile: stack vertically, headline 32px, buttons stacked full-width, code visual below.
-
---- SECTION 3: HOW WENZA WORKS — Three Pillars ---
-Bg #FDF6ED, padding 72px.
-Heading centered: "How Wenza Works" — Lora Bold 36px #3D2010.
-Sub: "A complete tech learning experience — not just videos. Real mentors, real projects, real community." — DM Sans 16px #8C7A68.
-
-3 large feature cards in a row, 24px gap:
-
-Card 1 — Expert-Built Courses:
-- Bg #FFF9F2, border #E8D5C0, radius 12px, pad 32px, centered
-- Icon: code/laptop icon, 56px, circle bg #FDF6ED, icon #B05010
-- Title: "Expert-Built Courses" — DM Sans SemiBold 20px #3D2010
-- Description: "200+ courses created by Wenza's team of experienced Nigerian developers. From Python basics to advanced ML — structured, project-based, and always up to date." — DM Sans 15px #6B4025
-- Link: "Browse Courses →" — DM Sans Medium 15px #B05010 — links to Courses Listing page
-- Hover: border #B05010, lift 4px
-
-Card 2 — Live Mentorship:
-- Same card style
-- Icon: headset/video-call icon
-- Title: "Live 1-on-1 Mentorship"
-- Description: "Book private sessions with Wenza's senior developers. Get code reviews, career advice, debug tricky problems, or get guided through your learning path. Real help from real engineers."
-- Link: "Meet Our Mentors →" — links to Mentorship page
-
-Card 3 — Developer Community:
-- Same card style
-- Icon: people/group icon
-- Title: "Developer Community"
-- Description: "Study groups, coding challenges, forums, and peer code reviews. Learn alongside thousands of Nigerian developers who understand your journey. You're never learning alone."
-- Link: "Join the Community →" — links to Community page
-
-Mobile: stack cards vertically.
-
---- SECTION 4: TECH CATEGORIES ---
-Bg #FFFFFF, padding 72px.
-Heading: "What You Can Learn" — Lora Bold 36px #3D2010, centered.
-Sub: "From your first line of code to deploying production apps — Wenza covers the full tech stack." — DM Sans 16px #8C7A68.
-4×2 grid, 20px gap. Cards: bg #FFF9F2, border #E8D5C0, radius 12px, pad 28px.
-Each: icon (44px, circle bg #FDF6ED, icon #B05010) + category name (SemiBold 16px) + course count (13px #8C7A68).
-
-THE 8 CATEGORIES:
-1. Python Programming — "24 Courses" (🐍 icon)
-2. JavaScript & TypeScript — "31 Courses" (⚡ icon)
-3. Frontend Development — "28 Courses" (🎨 icon)
-4. Backend Development — "22 Courses" (⚙️ icon)
-5. Mobile App Development — "18 Courses" (📱 icon)
-6. Data Science & Analytics — "20 Courses" (📊 icon)
-7. AI & Machine Learning — "15 Courses" (🤖 icon)
-8. Full-Stack Development — "19 Courses" (🔗 icon)
-
-Hover: border #B05010, lift 4px. Mobile: 2 columns.
-Each card links to Courses Listing page filtered by that category.
-
---- SECTION 5: FEATURED COURSES ---
-Bg #FDF6ED, padding 72px.
-Header row: "Popular Courses" (left, Lora Bold 36px) + "See All →" link (#B05010, links to Courses page).
-3-col grid, 24px gap. 6 course cards:
-Card: bg #FFF9F2, border #E8D5C0, radius 12px. Thumbnail (16:9, use a color matching the tech — green for Python, yellow for JS, etc.), category pill, title, course metadata, bottom: stars #D0A050 + rating + ₦ price.
-
-IMPORTANT: Every course says "Wenza Team" as the creator — NOT individual instructor names. Wenza creates all its own content.
-
-Thumbnail should also show two small badges:
-- Top-left: level badge ("Beginner" / "Intermediate" / "Advanced") — bg rgba(0,0,0,0.5), text white, 10px
-- Top-right: "Live Sessions" badge if the course includes live mentorship — bg #B05010, text white, 10px, with small white dot
-
-Card content (inside body area):
-- Category pill (bg #FDF6ED, text #B05010, 12px)
-- Course title (DM Sans SemiBold 16px #3D2010, max 2 lines)
-- Course metadata: "8 weeks • 42 lessons • 1,240 students" — DM Sans 13px #8C7A68
-- Bottom row: star #D0A050 + rating + (reviews) on left, ₦ price on right
-
-THE 6 COURSES:
-1. "Python for Absolute Beginners" — Python — ★4.9 (312) — ₦3,500 — Beginner — 8 weeks — Live Sessions
-2. "Complete JavaScript Masterclass" — JavaScript — ★4.8 (520) — ₦5,000 — Beginner — 12 weeks — Live Sessions
-3. "React & Next.js — Build Modern Web Apps" — Frontend — ★4.7 (189) — ₦6,500 — Intermediate — 10 weeks — Live Sessions
-4. "Data Science with Python & Pandas" — Data Science — ★4.8 (276) — ₦7,000 — Intermediate — 10 weeks — Live Sessions
-5. "Flutter Mobile App Development" — Mobile Dev — ★4.6 (203) — ₦6,000 — Intermediate — 10 weeks — Live Sessions
-6. "HTML & CSS — Your First Website" — Frontend — ★4.9 (445) — FREE (green #2D8B4E badge) — Beginner — 4 weeks — No live sessions
-
-Each card links to Course Detail page. Hover: lift 4px, border #B05010. Mobile: single column.
-
---- SECTION 6: MEET OUR MENTORS ---
-Bg #FFFFFF, padding 72px.
-Header row: "Meet Our Mentors" (left) + "View All →" link (#B05010, links to Mentorship page).
-4 mentor cards in row, 20px gap:
-Card: bg #FFF9F2, border #E8D5C0, radius 12px, pad 28px, centered.
-- Avatar circle (80px, 3px border #D0A050, dark brown background with white initials inside)
-- Name: DM Sans SemiBold 17px #3D2010
-- Role: DM Sans Medium 13px #B05010 (e.g., "Senior Software Engineer")
-- Specialty: DM Sans 13px #8C7A68 (e.g., "Python, Django, Data Science")
-- Rating: ★ + number in #D0A050 + "(sessions)" in #8C7A68
-- "Book Session" button — outline, border #B05010, text #B05010, h:36px, full-width, radius 8px
-
-IMPORTANT: These are Wenza's own team mentors, not freelance tutors. They work for Wenza.
-
-THE 4 MENTORS:
-1. Chidi Okonkwo — Senior Software Engineer — "Python, Django, Data Science" — ★4.9 (187 sessions)
-2. Fatima Ibrahim — Lead Frontend Developer — "React, Next.js, TypeScript" — ★4.8 (142 sessions)
-3. Emeka Nwankwo — ML Engineer — "Machine Learning, Python, TensorFlow" — ★4.9 (98 sessions)
-4. Aisha Bello — Full-Stack Developer — "Node.js, React, MongoDB" — ★4.7 (164 sessions)
-
-Each card links to Mentorship page. Hover: border #B05010, lift 4px. Mobile: 2-col grid or horizontal scroll.
-
---- SECTION 7: YOUR LEARNING JOURNEY ---
-Bg #3D2010, padding 72px. All text light.
-Heading: "Your Learning Journey" — Lora Bold 36px #FFFFFF, centered.
-Sub: "From zero to job-ready in 3 steps" — DM Sans 16px #E8D5C0.
-
-3 steps horizontal, connected by dashed line (#D0A050 at 30%):
-Step 1: circle "1" (56px, bg #B05010, text white) — "Pick Your Path" — "Choose a course or learning track. Start with Python, JavaScript, or whatever excites you. Free courses available to try first."
-Step 2: circle "2" — "Learn with Support" — "Work through projects. Book 1-on-1 mentorship when you're stuck. Join study groups to learn with others."
-Step 3: circle "3" — "Build & Get Certified" — "Complete real projects for your portfolio. Earn Wenza certificates. Join our career support network."
-
-Mobile: stack steps vertically.
-
---- SECTION 8: STATS BAR ---
-Full-width bg #B05010, padding 40px.
-5 stats in row, vertical dividers rgba(255,255,255,0.2):
-"10,000+" Active Learners / "200+" Courses / "50+" Mentors / "85%" Completion Rate / "3,000+" Certificates Issued
-Numbers: Lora Bold 36px #FFFFFF. Labels: DM Sans 13px rgba(255,255,255,0.8).
-Mobile: scrollable row or 3+2 grid.
-
---- SECTION 9: TESTIMONIALS ---
-Bg #FDF6ED, padding 72px.
-Heading: "What Our Learners Say" — centered.
-3 testimonial cards, 24px gap. Bg #FFFFFF, border #E8D5C0, radius 12px, pad 28px.
-Quote mark #D0A050, text italic #6B4025, avatar (dark brown circle with white initials) + name + role + city, 5 stars.
-
-1. "Wenza's Python course and the live mentorship sessions completely changed my career trajectory. I went from zero coding knowledge to landing my first developer role in Lagos within 5 months." — Blessing Okoro, Junior Developer, Lagos
-
-2. "The community on Wenza is incredible. The study groups kept me accountable, and having a real mentor to ask questions during live sessions made all the difference. Worth every Naira." — Emeka Ugwu, Frontend Developer, Abuja
-
-3. "I tried Udemy and Coursera but always dropped off. Wenza's live mentorship model is different — you can't hide. My mentor pushed me to actually build projects. Now I freelance full-time." — Hauwa Abdullahi, Freelance Developer, Kaduna
-
-Mobile: stack vertically.
-
---- SECTION 10: CTA ---
-Full-width, bg gradient #B05010 → #8B3E0D, padding 72px. Centered.
-Heading: "Ready to Start Your Tech Journey?" — Lora Bold 36px #FFFFFF.
-Sub: "Join 10,000+ Nigerians building careers in tech. Free courses available — no credit card needed." — DM Sans 17px rgba(255,255,255,0.85), max-width 480px.
-Two buttons centered, 16px gap:
-- "Start Learning Free" — bg #D0A050, text #3D2010, h:48px
-- "Browse Courses" — bg #FFFFFF, text #B05010, h:48px
-Mobile: buttons stack full-width.
-
---- SECTION 11: FOOTER (reused on every page) ---
-Bg #1A1008, padding 56px top 28px bottom.
-4 columns:
-Col 1 — Brand: "Wenza" (Lora Bold 22px #FFFFFF) + "Nigeria's tech learning platform. Master programming, web dev, mobile apps, and data science with expert mentorship and community." (14px #E8D5C0) + socials (Facebook, X, Instagram, LinkedIn, YouTube) #D0A050 + "hello@wenza.ng"
-Col 2 — "Learn": All Courses, Python, JavaScript, React & Next.js, Mobile Development, Data Science, AI & Machine Learning, Free Courses
-Col 3 — "Platform": Live Mentorship, Community & Forums, Study Groups, Certificates, Career Support, Student Dashboard
-Col 4 — "Company": About Wenza, Pricing, Contact Us, Careers, Blog, Privacy Policy, Terms of Service
-Links: 14px #E8D5C0, hover #D0A050.
-Bottom bar: "© 2026 Wenza. Made with ❤️ in Nigeria." left + "🇳🇬 Built for Nigerians, by Nigerians" right.
-Mobile: columns stack, accordion-style.
-
-RESPONSIVE BREAKPOINTS:
-Desktop 1200px+: default layout
-Tablet 768-1199px: 2-col grids, hero side-by-side reduced
-Mobile <768px: single column, 32px headlines, stacked buttons full-width, hamburger nav, 48px touch targets
-```
-
----
-
-## PAGE 2 — COURSES LISTING PAGE
-
-```
-Build the Courses Listing page for Wenza. Same navbar ("Courses" active) and footer. This page shows all of Wenza's tech courses. Remember: Wenza creates all its own courses — this is NOT a marketplace. Every course is "by Wenza Team."
-
---- NAVIGATION BAR ---
-Same as homepage. "Courses" link active (#B05010, 2px bottom border).
-
---- PAGE HEADER ---
-Bg #3D2010, padding 48px.
-Breadcrumb: "Home > Courses" — DM Sans 14px, "Home" linked #D0A050.
-Heading: "All Courses" — Lora Bold 40px #FFFFFF.
-Sub: "200+ expert-built tech courses. Learn at your pace with projects, live mentorship access, and certificates." — DM Sans 16px #E8D5C0.
-Quick filter pills row (horizontally scrollable): "All", "Free", "Beginner", "Intermediate", "Advanced", "Python", "JavaScript", "Frontend", "Backend", "Mobile", "Data Science", "AI / ML" — pill buttons, bg transparent, border #D0A050, text #D0A050, active: bg #D0A050, text #3D2010.
-
---- SEARCH & FILTER BAR ---
-Sticky below nav. Bg #FFFFFF, padding 16px 20px, border-bottom 1px #E8D5C0.
-- Search input (400px, h:44px, bg #FFF9F2, border #E8D5C0, radius 8px, placeholder "Search courses...", focus border #B05010)
-- Price dropdown: "All Prices" — Free, Under ₦5,000, ₦5,000-₦8,000, Above ₦8,000
-- Level dropdown: "All Levels" — Beginner, Intermediate, Advanced
-- Sort dropdown: "Most Popular", "Newest", "Price: Low to High", "Price: High to Low", "Highest Rated"
-- Feature filter: checkbox "Live Mentorship Included", "Has Certificate", "Free"
-Mobile: search full-width, filters behind "Filter" button → slide-up panel.
-
---- RESULTS AREA ---
-Bg #FDF6ED, padding 40px top 72px bottom. Max-width 1200px.
-
-Left sidebar (240px, desktop only):
-- "Categories" — clickable list with counts:
-  Python (24), JavaScript & TypeScript (31), Frontend Dev (28), Backend Dev (22), Mobile Dev (18), Data Science (20), AI & ML (15), Full-Stack (19)
-- Active: left 3px border #B05010, text #B05010
-- "Level" — checkboxes: Beginner, Intermediate, Advanced
-- "Features" — checkboxes: Live Mentorship Included, Has Certificate, Free Course
-- Each filter section collapsible
-
-Right grid:
-- Results count: "Showing 1-12 of 200+ courses"
-- 3-column course card grid (2 on tablet, 1 on mobile), 20px gap
-- Same card design as homepage: thumbnail with level badge + live sessions badge, category pill, title, "Wenza Team" creator, duration + lessons + students metadata, rating + ₦ price
-- Show 12 cards with variety across all categories, mix of free and paid, range of prices (₦3,500 to ₦8,000), mix of levels
-- Each card clickable → links to Course Detail page
-- Bottom: pagination — numbered pages with active #B05010, prev/next buttons
-
-Mobile: sidebar becomes filter overlay. Grid → single column.
-
---- FOOTER ---
-Same global footer.
-```
-
----
-
-## PAGE 3 — COURSE DETAIL PAGE
-
-```
-Build a Course Detail page for Wenza. This shows when a learner clicks any course card. Same navbar and footer. This page must convince the learner to enroll. Remember: the course is created by Wenza, not by an individual instructor.
-
---- NAV ---
-Same global nav. "Courses" subtly highlighted.
-
---- COURSE HEADER ---
-Bg #3D2010, padding 48px.
-Breadcrumb: "Home > Courses > Python for Absolute Beginners" — "Home" and "Courses" linked #D0A050.
-Left (60%):
-- Category pill: "Python" — border #D0A050, text #D0A050
-- Level pill next to it: "Beginner" — border rgba(255,255,255,0.3), text #E8D5C0
-- Title: "Python for Absolute Beginners" — Lora Bold 36px #FFFFFF
-- Description: "Go from zero Python knowledge to building real applications. Covers fundamentals, data structures, OOP, APIs, and your first 5 projects. Includes live mentorship sessions with senior developers." — DM Sans 16px #E8D5C0
-- Stats: "★ 4.9 (312 reviews) • 1,240 students • 8 weeks • 42 lessons" — 14px #8C7A68
-- Creator: "Created by Wenza Team" — 15px #E8D5C0
-- Two buttons: "Enroll Now — ₦3,500" (bg #B05010 text white h:48px) + "Preview Free Lessons" (outline #D0A050)
-Right (40%): video preview placeholder 16:9, rounded 12px, with centered play button overlay (64px circle bg rgba(176,80,16,0.9), white play icon).
-Mobile: stack, video on top, buttons full-width.
-
---- COURSE CONTENT — Tabbed Layout ---
-Bg #FDF6ED, padding 48px top 72px bottom.
-
-Left column (65%) — tabs:
-
-TAB 1: "Overview" (default active)
-- "What You'll Learn" — 2-column checklist grid with green checkmarks (#2D8B4E):
-  ✓ Python fundamentals & syntax
-  ✓ Data types, loops & functions
-  ✓ Object-oriented programming
-  ✓ File handling & API integration
-  ✓ Build 5 real-world projects
-  ✓ Version control with Git
-- "What's Included" — icon list:
-  • 42 structured lessons
-  • 5 hands-on projects
-  • 2 live mentorship sessions with a senior developer
-  • Community study group access
-  • Certificate of completion
-  • Lifetime course access
-- "Prerequisites" — "A laptop or desktop computer", "No prior coding experience needed", "Willingness to practice daily"
-- "Who This Is For" — "Complete beginners wanting to learn programming", "Career changers moving into tech", "Students looking for practical, project-based learning"
-
-TAB 2: "Curriculum"
-- Expandable/collapsible sections (accordion):
-  Module 1: Python Setup & First Program (4 lessons)
-  Module 2: Variables, Data Types & Operators (6 lessons)
-  Module 3: Control Flow & Loops (5 lessons)
-  Module 4: Functions & Modules (5 lessons)
-  Module 5: OOP & Classes (6 lessons)
-  Module 6: File I/O & APIs (5 lessons)
-  Module 7: Projects — Build 5 Real Apps (8 lessons)
-  Module 8: Final Assessment & Certificate (3 lessons)
-- Total: "42 lessons • 8 weeks of content • 5 projects"
-- Lock icons on most, unlock icons on first 2 modules (free preview)
-
-TAB 3: "Mentorship"
-- Explanation: "This course includes 2 live 1-on-1 mentorship sessions with a senior Python developer from Wenza's team. Use them to get code reviews, ask questions, or get career guidance."
-- "Need more mentorship? You can book additional sessions separately on our Mentorship page."
-- Show 2 mentor cards (from Wenza's mentor team) that specialize in Python
-- Link: "View all mentors →" — links to Mentorship page
-
-TAB 4: "Reviews"
-- Overall: "4.9" large + star bar distribution
-- 3 sample reviews with Nigerian names, ratings, dates
-
-Right column (35%) — Sticky sidebar:
-- Card bg #FFFFFF, border #E8D5C0, radius 12px, pad 24px, sticky on scroll
-- Price: "₦3,500" (Lora Bold 32px #B05010)
-- "One-time payment • Lifetime access" — 14px #8C7A68
-- "Enroll Now" button full-width bg #B05010 text white h:48px
-- "Try Free Lessons First" button — outline style
-- "30-Day Money-Back Guarantee" — small text with shield icon
-- "This course includes:" icon list: "42 structured lessons", "8 weeks of content", "5 hands-on projects", "2 live mentorship sessions", "Certificate of completion", "Community study group", "Lifetime access", "Offline downloads"
-- Divider
-- "Need Extra Help?" mini-section:
-  - "Book additional 1-on-1 mentorship sessions with a senior developer"
-  - "Book a Mentor →" — link #B05010 — links to Mentorship page
-
-Mobile: tabs → accordion, sidebar → fixed bottom bar (price + "Enroll" button).
-
---- FOOTER ---
-Same.
-```
-
----
-
-## PAGE 4 — MENTORSHIP PAGE
-
-```
-Build the Mentorship page for Wenza. Same navbar ("Mentorship" active) and footer. This page shows Wenza's own team of mentors (NOT freelance tutors — these are Wenza employees/team members). Learners book 1-on-1 sessions with them.
-
---- PAGE HEADER ---
-Bg gradient #1A1008 → #3D2010, padding 48px, centered.
-Heading: "1-on-1 Live Mentorship" — Lora Bold 40px #FFFFFF.
-Sub: "Get personal guidance from Wenza's senior developers. Code reviews, career advice, debugging help, or guided learning — whatever you need to level up." — DM Sans 16px #E8D5C0, max-width 560px.
-
---- OUR MENTORS ---
-Bg #FDF6ED, padding 72px.
-Heading: "Our Mentors" — centered.
-Sub: "Experienced developers who've been where you are. They'll help you get where you want to go."
-4 mentor cards in a grid, same design as homepage but with more detail:
-Card: bg #FFF9F2, border #E8D5C0, radius 12px, pad 28px, centered.
-- Avatar (80px circle, 3px border #D0A050, dark bg, white initials)
-- Name, Role (#B05010), Specialty (#8C7A68)
-- Rating: ★ + number + (sessions)
-- "Book Session" button — bg #B05010, text white, h:36px, full-width
-
-Same 4 mentors as homepage:
-1. Chidi Okonkwo — Senior Software Engineer — Python, Django, Data Science — ★4.9 (187)
-2. Fatima Ibrahim — Lead Frontend Developer — React, Next.js, TypeScript — ★4.8 (142)
-3. Emeka Nwankwo — ML Engineer — Machine Learning, Python, TensorFlow — ★4.9 (98)
-4. Aisha Bello — Full-Stack Developer — Node.js, React, MongoDB — ★4.7 (164)
-
---- HOW MENTORSHIP WORKS ---
-Bg #FFFFFF, padding 72px.
-Heading: "How It Works" — centered.
-4 steps horizontal:
-1. 🔍 "Pick a Mentor" — "Browse mentors by specialty and read reviews from other learners"
-2. 📅 "Book a Time" — "Choose a 30 or 60-minute slot that works for your schedule"
-3. 📹 "Join the Call" — "Connect via video call with screen sharing for code reviews"
-4. 🚀 "Level Up" — "Get actionable feedback, resources, and a clear next step"
-Cards: bg #FFF9F2, border #E8D5C0, radius 12px, pad 24px, centered.
-
---- MENTORSHIP PRICING ---
-Bg #FDF6ED, padding 72px, centered.
-Heading: "Mentorship Pricing" — centered.
-3 pricing cards:
-
-Card 1 — "Single Session":
-- "₦5,000" — Lora Bold 44px #3D2010
-- "60 minutes, 1-on-1"
-- Features: Code review, Career advice, Debugging help, Learning guidance
-- Button: outline
-
-Card 2 — "4-Session Pack" (HIGHLIGHTED, border 2px #B05010):
-- "BEST VALUE" badge
-- "₦18,000" — Lora Bold 44px #B05010
-- "Save ₦2,000"
-- Features: Everything in Single, Priority booking, WhatsApp follow-up, Session notes
-- Button: filled #B05010
-
-Card 3 — "8-Session Pack":
-- "₦32,000" — Lora Bold 44px #3D2010
-- "Save ₦8,000"
-- Features: Everything in 4-Pack, Dedicated mentor, Project reviews, Career roadmap
-- Button: outline
-
-Mobile: stack cards vertically.
-
---- FOOTER ---
-Same.
-```
-
----
-
-## PAGE 5 — COMMUNITY PAGE
-
-```
-Build the Community page for Wenza. Same navbar ("Community" active) and footer. This is the page that shows Wenza's developer community features.
-
---- PAGE HEADER ---
-Bg gradient #1A1008 → #3D2010, padding 48px, centered.
-Heading: "Join the Wenza Developer Community" — Lora Bold 40px #FFFFFF.
-Sub: "Learn alongside 10,000+ Nigerian developers. Study groups, coding challenges, forums, and peer code reviews — because learning alone is hard." — DM Sans 16px #E8D5C0, max-width 560px.
-
---- COMMUNITY FEATURES ---
-Bg #FDF6ED, padding 72px.
-3 large feature cards, 24px gap:
-
-Card 1 — Forums:
-- 💬 icon, 40px
-- Title: "Discussion Forums"
-- Desc: "Ask questions, share knowledge, and help others. Our forums cover every tech topic from Python basics to system design."
-- Button: "Browse Forums"
-
-Card 2 — Study Groups:
-- 👥 icon
-- Title: "Study Groups"
-- Desc: "Join a study group matched to your course and level. Weekly meetups, accountability partners, and group projects."
-- Button: "Find a Group"
-
-Card 3 — Coding Challenges:
-- ⚔️ icon
-- Title: "Coding Challenges"
-- Desc: "Weekly coding challenges to sharpen your skills. Compete with other learners, earn badges, and build your profile."
-- Button: "Start a Challenge"
-
-Cards: bg #FFF9F2, border #E8D5C0, radius 16px, pad 32px, centered.
-
---- COMMUNITY STATS ---
-Bg #FFFFFF, padding 72px.
-4 stat cards in a row:
-"10,000+ Members" / "500+ Study Groups" / "2,000+ Forum Posts/Week" / "50+ Weekly Challenges"
-Cards: bg #FFF9F2, border #E8D5C0, radius 12px, centered.
-
---- CTA ---
-Bg gradient #B05010 → #8B3E0D, padding 72px, centered.
-Heading: "Community is Free for All Learners" — white.
-Sub: "Create your account and join today." — rgba(255,255,255,0.85).
-Button: "Create Your Account" — bg #D0A050, text #3D2010
-
---- FOOTER ---
-Same.
-```
-
----
-
-## PAGE 6 — ABOUT US PAGE
-
-```
-Build the About Us page for Wenza. Same navbar ("About" active) and footer. Focus on the fact that Wenza is a tech education platform that creates its own content — not a marketplace.
-
---- HERO ---
-Bg gradient #1A1008 → #3D2010, padding 64px, centered.
-Heading: "Built for Nigerian Developers. By Nigerian Developers." — Lora Bold 40px #FFFFFF.
-Sub: "Wenza exists because every Nigerian deserves access to world-class tech education — at prices that make sense, with mentors who understand the journey." — DM Sans 18px #E8D5C0, max-width 600px.
-
---- OUR STORY ---
-Bg #FDF6ED, padding 72px, two columns:
-Left (50%): image placeholder — team photo, radius 12px.
-Right (50%):
-Title: "The Wenza Story" — Lora Bold 32px #3D2010.
-"Wenza started in 2024 when a group of Nigerian software engineers saw a problem they'd all experienced: international platforms like Udemy and Coursera were expensive, their content wasn't tailored to the Nigerian tech ecosystem, and there was no real mentorship."
-"So we built something different. Wenza isn't a marketplace — it's a curated learning platform. Every course is created by our team of experienced developers, designed with Nigerian learners in mind, and backed by live mentorship."
-"Today, 10,000+ learners across Nigeria trust Wenza to build their tech careers."
-Mobile: stack vertically.
-
---- WHAT SETS US APART ---
-Bg #FFFFFF, padding 72px.
-Heading: "What Sets Us Apart" — centered.
-4 value cards in a row:
-1. 💰 "Affordable in Naira" — "No dollar pricing. No exchange rate surprises. Quality tech education from ₦3,500."
-2. 🎧 "Real Mentorship" — "Not just videos. Every paid course includes live 1-on-1 sessions with Wenza's senior developers."
-3. 📱 "Built for Nigeria" — "Low-data mode, offline downloads, and optimized for the networks and devices Nigerians actually use."
-4. 👥 "Community First" — "Study groups, forums, coding challenges, and peer reviews. You're never learning alone."
-Cards: bg #FFF9F2, border #E8D5C0, radius 12px, centered.
-Mobile: 2×2 then single column.
-
---- STATS BAR ---
-Same as homepage.
-
---- FOOTER ---
-Same.
-```
-
----
-
-## PAGE 7 — PRICING PAGE
-
-```
-Build the Pricing page for Wenza. Same navbar ("Pricing" active) and footer. Pricing covers courses and mentorship. There is NO instructor pricing — Wenza is not a marketplace.
-
---- HEADER ---
-Bg #3D2010, padding 56px, centered.
-Heading: "Simple, Transparent Pricing" — Lora Bold 40px #FFFFFF.
-Sub: "Start free. Pay per course. Or go unlimited. All prices in Naira." — DM Sans 16px #E8D5C0.
-
---- PRICING CARDS ---
-Bg #FDF6ED, padding 72px, centered.
-3 cards, 24px gap, max-width 960px centered.
-
-Card 1 — "Free":
-- Bg #FFF9F2, border 1px #E8D5C0, radius 16px, pad 36px
-- "₦0" — Lora Bold 44px #3D2010
-- "Start learning today"
-- ✅ Free courses (HTML, CSS, Git)
-- ✅ Community forum access
-- ✅ Study group participation
-- ✅ Weekly coding challenges
-- ❌ Paid courses
-- ❌ Certificates
-- ❌ Mentorship sessions
-- Button: "Get Started Free" outline — links to Sign Up
-
-Card 2 — "Per Course" (HIGHLIGHTED, border 2px #B05010):
-- "MOST POPULAR" badge
-- "From ₦3,500" — Lora Bold 44px #B05010
-- "One-time payment, lifetime access"
-- ✅ All Free features
-- ✅ Premium structured courses
-- ✅ Hands-on projects
-- ✅ Certificate of completion
-- ✅ 2 mentorship sessions included
-- ✅ Offline downloads
-- Button: "Browse Courses" filled #B05010 — links to Courses page
-
-Card 3 — "Unlimited":
-- "₦15,000/mo" — Lora Bold 44px #3D2010
-- "Access everything, cancel anytime"
-- ✅ All 200+ courses unlocked
-- ✅ Unlimited certificates
-- ✅ 4 mentorship sessions/month
-- ✅ Priority community support
-- ✅ Early access to new courses
-- ✅ Career support & job board
-- Button: "Start 7-Day Free Trial" outline
-
-Mobile: stack vertically. Highlighted card stays prominent.
-
-MENTORSHIP ADD-ON NOTE (below cards):
-Bg #FFF9F2, border #E8D5C0, radius 12px, pad 24px, centered max-width 700px.
-"🎧 Extra Mentorship Sessions" — DM Sans SemiBold 18px #3D2010
-"Need more 1-on-1 time? Book additional mentorship packs: Single (₦5,000), 4-Pack (₦18,000), or 8-Pack (₦32,000)." — DM Sans 15px #6B4025
-"View Mentorship Options →" link #B05010 — links to Mentorship page
-
---- FAQ SECTION ---
-Bg #FFFFFF, padding 72px. Heading: "Common Questions" — centered.
-6 FAQ accordion items:
-1. "Is Wenza really free to start?" → "Yes. Create an account and access free courses in HTML, CSS, and Git immediately. No credit card required."
-2. "How do I pay?" → "We accept debit cards via Paystack, bank transfer, and USSD. All payments are in Naira (₦)."
-3. "Can I access courses offline?" → "Yes. Paid courses can be downloaded for offline viewing on the Wenza mobile app."
-4. "What kind of certificates do you offer?" → "Each paid course includes a verifiable digital certificate of completion that you can share on LinkedIn or with employers."
-5. "How does mentorship work?" → "Each paid course includes 2 live 1-on-1 sessions with a Wenza senior developer. You can also buy additional mentorship packs separately."
-6. "What if I'm not satisfied?" → "All paid courses come with a 30-day money-back guarantee."
-
---- FOOTER ---
-Same.
-```
-
----
-
-## PAGE 8 — CONTACT PAGE
-
-```
-Build the Contact page for Wenza. Same navbar and footer.
-
---- HEADER ---
-Bg #3D2010, padding 48px, centered.
-Heading: "Get in Touch" — Lora Bold 40px #FFFFFF.
-Sub: "Questions about courses, mentorship, or your account? We typically respond within 24 hours." — DM Sans 16px #E8D5C0.
-
---- TWO-COLUMN LAYOUT ---
-Bg #FDF6ED, padding 72px.
-
-Left (55%): Contact Form
-Card bg #FFFFFF, border #E8D5C0, radius 16px, pad 36px.
-- "Send Us a Message" — DM Sans SemiBold 20px #3D2010
-- "Full Name" input
-- "Email Address" input
-- "Subject" dropdown: "General Inquiry", "Course Help", "Mentorship Question", "Payment Issue", "Technical Problem", "Partnership"
-- "Your Message" textarea
-- "Send Message" button full-width bg #B05010
-- "We respond within 24 hours — usually much faster." — 13px #8C7A68
-
-Right (45%): Contact Info
-3 stacked cards:
-1. 📧 "Email Us" — "hello@wenza.ng" — "For general inquiries"
-2. 📞 "WhatsApp" — "+234 800 WENZA" — "Mon-Fri 9am-6pm WAT"
-3. 📍 "Location" — "Lagos, Nigeria" — "Remote-first team"
-Cards: bg #FFF9F2, border #E8D5C0, radius 12px, pad 24px.
-
-Mobile: stack left/right vertically.
-
---- FOOTER ---
-Same.
-```
-
----
-
-## PAGE 9 — SIGN UP / LOGIN PAGE
-
-```
-Build Sign Up and Login page for Wenza. Simplified nav (logo + "Back to Home"). Simple sign-up — no learner/instructor choice since Wenza is not a marketplace.
-
---- SIMPLIFIED NAV ---
-Bg #FFFFFF, h:64px, border-bottom 1px #E8D5C0. Left: "Wenza" Lora Bold 24px #3D2010. Right: "← Back to Home" #B05010.
-
---- AUTH SECTION ---
-Bg #FDF6ED, full height, flex center. Padding 48px.
-Card max-width 440px, bg #FFFFFF, radius 16px, shadow 0 16px 48px rgba(26,16,8,0.12), pad 40px.
-
-SIGN UP STATE (default):
-- "Wenza" centered (Lora Bold 22px #3D2010)
-- Heading: "Start Your Tech Journey" — Lora Bold 24px #3D2010, centered
-- Sub: "Join 10,000+ Nigerians learning tech on Wenza" — DM Sans 14px #8C7A68, centered
-- Form fields (16px gap):
-  - "Full Name" input (h:44px, bg #FFF9F2, border #E8D5C0, radius 8px, focus border #B05010)
-  - "Email Address" input
-  - "Create Password" input with show/hide eye toggle
-- "Create Account" button full-width bg #B05010 text #FFFFFF h:48px radius 8px
-- Divider: horizontal line with "or" text centered
-- "Continue with Google" button — full-width, outline style
-- "Already have an account? Log In" — switch link
-
-LOGIN STATE:
-- "Welcome Back" heading
-- Email + Password fields
-- "Forgot Password?" link #B05010
-- "Log In" button
-- Google login
-- "New to Wenza? Sign Up"
-
-Mobile: card fills full width, no side margins.
-
---- SIMPLIFIED FOOTER ---
-"© 2026 Wenza" + Privacy + Terms, centered.
-```
-
----
-
-## PAGE 10 — STUDENT DASHBOARD
-
-```
-Build a Student Dashboard for Wenza. This is what learners see after logging in. Dashboard-style layout with sidebar nav. Shows enrolled courses, upcoming mentorship sessions, progress, and certificates.
-
---- DASHBOARD NAV ---
-Bg #1A1008, h:64px.
-Left: "Wenza" logo text (Lora Bold 22px #FFFFFF).
-Center: search bar (320px, h:40px, bg rgba(255,255,255,0.1), border rgba(255,255,255,0.15), radius 20px, placeholder "Search courses...", text #FFFFFF).
-Right: notification bell icon (#D0A050) with red dot, then avatar circle (36px, border 2px #D0A050, dark bg with white initials) + "Hi, Blessing" (DM Sans 14px #FFFFFF).
-
---- SIDEBAR (240px, desktop) ---
-Bg #FFF9F2, border-right 1px #E8D5C0, full height.
-Menu items (icon + label, 48px height):
-- 📊 Dashboard (active — bg #FDF6ED, left 3px #B05010, text #B05010)
-- 📚 My Courses
-- 🎧 Mentorship Sessions
-- 🏆 Certificates
-- 💬 Community
-- 👤 Profile & Settings
-- 🚪 Log Out
-Mobile: bottom tab bar with 5 main icons.
-
---- MAIN CONTENT ---
-Bg #FDF6ED, padding 32px.
-
-WELCOME BANNER:
-Card bg gradient #B05010 → #8B3E0D, radius 12px, pad 28px.
-"Welcome back, Blessing! 🎉" — Lora Bold 22px #FFFFFF.
-"You have 1 mentorship session today at 4PM and 2 courses in progress." — DM Sans 15px rgba(255,255,255,0.85).
-"Continue Learning" button bg #D0A050 text #3D2010 h:40px radius 8px.
-
-STATS ROW — 4 mini cards, 16px gap:
-1. "3" — "Enrolled Courses"
-2. "5" — "Mentorship Sessions"
-3. "24" — "Hours Learned"
-4. "1" — "Certificates"
-Each: bg #FFFFFF, border #E8D5C0, radius 12px, pad 20px, centered.
-
-UPCOMING MENTORSHIP SESSION:
-Heading: "Upcoming Mentorship" — DM Sans SemiBold 18px.
-Card: bg #FFFFFF, border #E8D5C0, radius 12px, pad 20px.
-- "Today, 4:00 PM WAT" — DM Sans SemiBold 15px #B05010
-- "Python Code Review — 1 hour session" — 16px #3D2010
-- Tutor: avatar (28px, dark bg, white initials "CO") + "with Chidi Okonkwo" — 14px #6B4025
-- Two buttons: "Join Session" (bg #2D8B4E text white h:36px) + "Reschedule" (outline #E8D5C0, text #6B4025)
-
-CONTINUE LEARNING:
-Heading: "Continue Where You Left Off"
-2 horizontal progress cards:
-Card: bg #FFFFFF, border #E8D5C0, radius 12px, pad 20px, horizontal layout.
-- Thumbnail (80x60px, rounded 8px, colored bg matching course)
-- Title + "Wenza Team" + progress bar (h:6px, bg #E8D5C0, filled #B05010) + "65% complete"
-- "Resume" button (bg #B05010 text white h:36px)
-
-Courses:
-1. "Python for Absolute Beginners" — 65% complete
-2. "Complete JavaScript Masterclass" — 30% complete
-
-RECOMMENDED:
-Heading: "Recommended For You"
-3 course cards in a row — same design as courses listing.
-
-Mobile: everything single column. Stats 2×2 grid. Sidebar → bottom tab bar.
-
---- SIMPLIFIED FOOTER ---
-"© 2026 Wenza" + Help Center + Terms, centered.
-```
-
----
-
-## PAGE 11 — DESIGN SYSTEM
-
-```
-Create a Design System reference page for the Wenza project. This is NOT user-facing — it's an internal designer reference for maintaining consistency.
-
-Include:
-- COLOR PALETTE: all 14 brand colors with swatches, hex codes, and usage notes
-- TYPOGRAPHY: Lora (headings) and DM Sans (body) with all sizes, weights, line-heights
-- BUTTONS: Primary, Outline, Gold, White, Success — default/hover/active/disabled states, 3 sizes (large 48px, medium 40px, small 36px)
-- FORM ELEMENTS: inputs, dropdowns, textareas, checkboxes — default/focus/error/disabled
-- CARDS: Course card, Mentor card, Category card, Testimonial card, Stat card, Session card, Progress card, Pricing card
-- BADGES & TAGS: Category pills, Level badges (Beginner/Intermediate/Advanced), "FREE" badge, "Live Sessions" badge, "MOST POPULAR" badge, "BEST VALUE" badge, star ratings
-- NAVIGATION: Desktop navbar, Mobile hamburger + dropdown, Dashboard sidebar, Dashboard top bar, Bottom tab bar (mobile dashboard), Breadcrumbs, Pagination
-- ICONS: standard set at 24px, color #B05010 default
-- SPACING: 4px base (4, 8, 12, 16, 20, 24, 28, 32, 40, 48, 56, 64, 72, 80)
-- FOOTER: full version and simplified version
-- AVATAR: sizes (28px, 36px, 40px, 80px, 120px), dark brown bg with white initials, gold border style
-- CODE BLOCK: syntax-highlighted code display component for course previews
-```
-
----
-
-## FINAL — PROTOTYPE CONNECTIONS MAP
-
-After all pages are in one Figma Design file, wire these in Prototype mode:
-
-```
-GLOBAL NAVBAR LINKS (every public page):
-Home → Homepage
-Courses → Courses Listing
-Mentorship → Mentorship page
-Community → Community page
-Pricing → Pricing page
-About → About Us page
-Log In → Login state of Sign Up/Login page
-Start Learning → Sign Up state of Sign Up/Login page
-Wenza logo → Homepage
-
-HOMEPAGE:
-"Explore Courses" → Courses Listing
-"Book a Mentor" → Mentorship page
-"Join Community" → Community page
-Category cards → Courses Listing (filtered by that category)
-Course cards → Course Detail page
-Mentor cards → Mentorship page
-"See All →" (courses) → Courses Listing
-"View All →" (mentors) → Mentorship
-"Start Learning Free" → Sign Up page
-"Browse Courses" → Courses Listing
-
-COURSES LISTING:
-Course cards → Course Detail page
-Category sidebar links → filter (same page, filtered state)
-Filter pills → filter (same page)
-
-COURSE DETAIL:
-"Enroll Now" → Sign Up page (if not logged in) or Dashboard (if logged in)
-"Preview Free Lessons" → opens video modal or expands curriculum
-"Book a Mentor →" → Mentorship page
-"View all mentors →" → Mentorship page
-Tabs → switch between Overview/Curriculum/Mentorship/Reviews
-
-MENTORSHIP:
-"Book Session" buttons → Sign Up page (if not logged in) or booking flow
-Mentor cards are informational (not clickable to individual profiles — Wenza mentors are a team)
-
-COMMUNITY:
-"Browse Forums" / "Find a Group" / "Start a Challenge" → Sign Up (if not logged in) or respective community section
-"Create Your Account" → Sign Up page
-
-PRICING:
-"Get Started Free" → Sign Up page
-"Browse Courses" → Courses Listing
-"Start 7-Day Free Trial" → Sign Up page
-"View Mentorship Options →" → Mentorship page
-
-ABOUT:
-No special links beyond global nav
-
-CONTACT:
-"Send Message" → shows success/confirmation state
-
-SIGN UP / LOGIN:
-After Sign Up → Dashboard
-After Login → Dashboard
-"← Back to Home" → Homepage
-Forgot Password → forgot password flow
-
-DASHBOARD:
-"Continue Learning" / "Resume" → Course Detail page
-"Join Session" → video call placeholder screen
-Course cards → Course Detail page
-Sidebar nav → respective dashboard sections
-"Log Out" → Homepage
-
-FOOTER LINKS (every public page):
-All Courses / Python / JavaScript / etc. → Courses Listing
-Live Mentorship → Mentorship page
-Community & Forums / Study Groups → Community page
-Certificates → Dashboard (certificates section)
-About Wenza → About Us page
-Pricing → Pricing page
-Contact Us → Contact page
-
-TRANSITIONS:
-Page-to-page: "Smart Animate" or "Dissolve", 300ms ease
-Modals: "Move In" from bottom, 250ms
-Tab switching: "Instant" (no animation)
-```
-
----
-
-## DESIGN TOKENS REFERENCE
-
-| Token | Value | Usage |
+| App | Port | URL |
 |---|---|---|
-| Primary | `#B05010` | Buttons, links, CTAs, active states |
-| Primary Hover | `#8B3E0D` | Button hover/pressed |
-| Secondary | `#A05020` | Secondary accents |
-| Gold | `#D0A050` | Stars, badges, highlights, mentor avatar borders |
-| Dark BG | `#1A1008` | Footer, dashboard nav |
-| Deep Brown | `#3D2010` | Headings, dark section BGs, page headers |
-| Body Text | `#6B4025` | Paragraphs |
-| Page BG | `#FDF6ED` | Main background |
-| Card BG | `#FFF9F2` | Cards, inputs, sidebar |
-| Border | `#E8D5C0` | Dividers, borders |
-| Muted | `#8C7A68` | Captions, metadata |
-| Success | `#2D8B4E` | Free badges, join session buttons, checkmarks |
-| Error | `#C43D2E` | Errors |
-| White | `#FFFFFF` | Text on dark |
-| Heading Font | `Lora` Bold | Headings |
-| Body Font | `DM Sans` | Body, UI, buttons |
-| Card Radius | `12px` | Cards |
-| Button Radius | `8px` | Buttons |
-| Pill Radius | `100px` | Tags, badges |
-| Shadow | `0 4px 16px rgba(26,16,8,0.08)` | Cards |
-| Currency | `₦` | All prices |
+| `web` (marketing) | 3000 | http://localhost:3000 |
+| `app` (LMS) | 3001 | http://localhost:3001 |
+| `certificates` | 3002 | http://localhost:3002 |
+| `scholarship` | 3003 | http://localhost:3003 |
+
+### Run a Single App
+
+```bash
+pnpm --filter=web dev
+pnpm --filter=app dev
+```
 
 ---
 
-## CHECKLIST BEFORE SUBMISSION
+## 3. Monorepo Structure
 
-- [ ] All 10 user-facing pages built
-- [ ] Design System page with all reusable components
-- [ ] Navbar consistent across pages (active state changes per page)
-- [ ] Footer consistent across all public pages (simplified for auth + dashboard)
-- [ ] Prototype connections wired between ALL pages
-- [ ] Mobile responsive frames/constraints for each page
-- [ ] Three pillars visible on homepage: Courses + Mentorship + Community
-- [ ] All text uses Lora (headings) + DM Sans (body)
-- [ ] All colors match Wenza palette — zero leftover template colors
-- [ ] All prices in ₦ (Naira)
-- [ ] All courses say "Wenza Team" or "Created by Wenza" — NO individual instructor names on courses
-- [ ] NO marketplace language anywhere (no "list your course", "set your price", "earn on Wenza", "become an instructor")
-- [ ] NO exam prep content (no WAEC, JAMB, NECO)
-- [ ] All course categories are tech-only: Python, JavaScript, Frontend, Backend, Mobile, Data Science, AI/ML, Full-Stack
-- [ ] Mentors are presented as Wenza team members, not freelancers
-- [ ] Touch targets minimum 44px on mobile
-- [ ] Wenza logo placeholder in navbar and footer on every page
-- [ ] Code editor visual in hero section (not generic student photos)
+```
+wenza/
+├── apps/
+│   ├── web/                            # wenza.com — marketing
+│   │   ├── app/
+│   │   │   ├── (marketing)/
+│   │   │   ├── courses/
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── [slug]/page.tsx
+│   │   │   ├── about/page.tsx
+│   │   │   ├── contact/page.tsx
+│   │   │   └── layout.tsx
+│   │   ├── content/                    # MDX course content
+│   │   │   └── courses/
+│   │   │       ├── software-development.mdx
+│   │   │       └── ...
+│   │   └── package.json
+│   ├── app/                            # app.wenza.com — LMS
+│   ├── certificates/                   # certificates.wenza.com
+│   └── scholarship/                    # scholarship.wenza.com
+├── packages/
+│   ├── ui/                             # shared shadcn components + design tokens
+│   │   ├── components/
+│   │   │   ├── button.tsx
+│   │   │   ├── card.tsx
+│   │   │   ├── course-card.tsx
+│   │   │   ├── testimonial-marquee.tsx
+│   │   │   └── ...
+│   │   ├── styles/
+│   │   │   └── tokens.css              # ★ canonical design tokens
+│   │   └── tailwind/
+│   │       └── preset.ts               # shared Tailwind preset
+│   ├── api-client/                     # typed API client + useRequest hooks
+│   │   ├── base-request.ts
+│   │   ├── use-request.ts
+│   │   ├── use-mutation-request.ts
+│   │   └── types/
+│   │       ├── envelope.ts
+│   │       ├── course.ts
+│   │       ├── user.ts
+│   │       └── ...
+│   ├── store/                          # Redux store (shared across apps)
+│   │   ├── slices/
+│   │   │   ├── auth-slice.ts
+│   │   │   └── ui-slice.ts
+│   │   └── index.ts
+│   └── config/                         # shared eslint, tsconfig, prettier
+├── turbo.json
+├── pnpm-workspace.yaml
+└── package.json
+```
+
+> **Why a monorepo?** Four apps share the same auth state, design tokens, components, and API client. Duplicating any of that across four Next.js projects would be a maintenance nightmare. Turborepo gives us a single `pnpm dev` that runs all four with shared cache.
+
 ---
 
-**Wenza E-Learning Platform — Figma Redesign Prompt**
+## 4. Design Tokens
+
+The design system is **non-negotiable**. Every colour, radius, and shadow comes from this table. Never introduce off-token values.
+
+### 4.1 CSS Variables
+
+Defined once in `packages/ui/styles/tokens.css` and imported into each app's `globals.css`:
+
+```css
+:root {
+  /* Brand */
+  --color-primary: #B05010;
+  --color-primary-hover: #8B3E0D;
+  --color-secondary: #A05020;
+  --color-accent-gold: #C8882B;
+  --color-gold: #D0A050;
+
+  /* Surfaces */
+  --color-bg-page: #FDF6ED;
+  --color-bg-card: #FFF9F2;
+  --color-bg-dark: #1A1008;
+  --color-bg-deep-brown: #3D2010;
+
+  /* Text */
+  --color-text-heading: #3D2010;
+  --color-text-body: #6B4025;
+  --color-text-muted: #8C7A68;
+  --color-text-on-dark: #FFFFFF;
+
+  /* Lines */
+  --color-border: #E8D5C0;
+
+  /* Status */
+  --color-success: #2D8B4E;
+  --color-error: #C43D2E;
+
+  /* Radii */
+  --radius-card: 12px;
+  --radius-button: 8px;
+  --radius-pill: 100px;
+
+  /* Shadow */
+  --shadow-card: 0 4px 16px rgba(26, 16, 8, 0.08);
+
+  /* Typography */
+  --font-heading: 'Urbanist', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+```
+
+### 4.2 Tailwind Preset
+
+`packages/ui/tailwind/preset.ts` exposes these as Tailwind utilities:
+
+```ts
+import type { Config } from 'tailwindcss';
+
+export default {
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          DEFAULT: 'var(--color-primary)',
+          hover: 'var(--color-primary-hover)',
+        },
+        secondary: 'var(--color-secondary)',
+        gold: 'var(--color-gold)',
+        'accent-gold': 'var(--color-accent-gold)',
+        bg: {
+          page: 'var(--color-bg-page)',
+          card: 'var(--color-bg-card)',
+          dark: 'var(--color-bg-dark)',
+          'deep-brown': 'var(--color-bg-deep-brown)',
+        },
+        text: {
+          heading: 'var(--color-text-heading)',
+          body: 'var(--color-text-body)',
+          muted: 'var(--color-text-muted)',
+          'on-dark': 'var(--color-text-on-dark)',
+        },
+        border: 'var(--color-border)',
+        success: 'var(--color-success)',
+        error: 'var(--color-error)',
+      },
+      borderRadius: {
+        card: 'var(--radius-card)',
+        button: 'var(--radius-button)',
+        pill: 'var(--radius-pill)',
+      },
+      boxShadow: {
+        card: 'var(--shadow-card)',
+      },
+      fontFamily: {
+        heading: ['var(--font-heading)'],
+        body: ['var(--font-body)'],
+      },
+    },
+  },
+} satisfies Partial<Config>;
+```
+
+Each app's `tailwind.config.ts` extends this preset.
+
+### 4.3 Token Reference
+
+| Token | Value | Tailwind Class | Usage |
+|---|---|---|---|
+| Primary | `#B05010` | `bg-primary text-primary` | CTAs, links, active states |
+| Primary Hover | `#8B3E0D` | `hover:bg-primary-hover` | Button hover/pressed |
+| Secondary | `#A05020` | `bg-secondary` | Secondary buttons, category tags |
+| Accent Gold | `#C8882B` | `bg-accent-gold` | Premium badges, notifications |
+| Gold | `#D0A050` | `text-gold` | Stars, mentor borders |
+| Page BG | `#FDF6ED` | `bg-bg-page` | Main background |
+| Card BG | `#FFF9F2` | `bg-bg-card` | Cards, inputs |
+| Dark BG | `#1A1008` | `bg-bg-dark` | Footer, dashboard nav |
+| Deep Brown | `#3D2010` | `bg-bg-deep-brown text-text-heading` | Headings, dark sections |
+| Body Text | `#6B4025` | `text-text-body` | Paragraphs |
+| Border | `#E8D5C0` | `border-border` | Dividers |
+| Muted | `#8C7A68` | `text-text-muted` | Captions, metadata |
+| Success | `#2D8B4E` | `bg-success` | Free badges, success states |
+| Error | `#C43D2E` | `text-error` | Errors |
+| Card Radius | `12px` | `rounded-card` | Cards |
+| Button Radius | `8px` | `rounded-button` | Buttons |
+| Pill Radius | `100px` | `rounded-pill` | Tags, badges |
+| Shadow | `0 4px 16px rgba(26,16,8,0.08)` | `shadow-card` | Cards |
+
+### 4.4 Currency
+
+All prices in **Naira (₦)** by default. Show USD as a secondary line on globally-targeted pages. Use a shared `formatCurrency` helper:
+
+```ts
+// packages/ui/lib/format.ts
+export const formatNaira = (kobo: number) =>
+  new Intl.NumberFormat('en-NG', {
+    style: 'currency',
+    currency: 'NGN',
+    maximumFractionDigits: 0,
+  }).format(kobo);
+
+// → "₦250,000"
+```
 
 ---
 
-> **Objective:** Rebrand the "E-Learning Site (Community)" Figma template by Shinobi (Tadashi Amano) into the **Wenza** e-learning platform — an Africa-focused online learning platform. Apply the Wenza brand identity across every page and component.
+## 5. Typography
+
+Two fonts loaded via `next/font/google` for automatic optimisation:
+
+```ts
+// packages/ui/fonts.ts
+import { Urbanist, DM_Sans } from 'next/font/google';
+
+export const urbanist = Urbanist({
+  subsets: ['latin'],
+  weight: ['600', '700', '800'],
+  variable: '--font-heading',
+});
+
+export const dmSans = DM_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-body',
+});
+```
+
+Apply in root layout:
+
+```tsx
+<body className={`${urbanist.variable} ${dmSans.variable} font-body bg-bg-page text-text-body`}>
+```
+
+### 5.1 Scale
+
+| Role | Font | Desktop | Mobile | Weight |
+|---|---|---|---|---|
+| Display / Hero | Urbanist | 64px | 40px | 800 |
+| H1 | Urbanist | 48px | 32px | 700 |
+| H2 | Urbanist | 36px | 28px | 700 |
+| H3 | Urbanist | 28px | 22px | 600 |
+| H4 | Urbanist | 22px | 18px | 600 |
+| Body Large | DM Sans | 18px | 16px | 400 |
+| Body | DM Sans | 16px | 15px | 400 |
+| Body Small | DM Sans | 14px | 13px | 400 |
+| Caption | DM Sans | 12px | 12px | 500 |
 
 ---
 
-### 🎨 BRAND COLOR SYSTEM (extracted from Wenza logo)
+## 6. Component Conventions
 
-Replace all existing template colors with these:
+### 6.1 Buttons
 
-| Role | Hex Code | Usage |
+```tsx
+// Primary
+<Button className="rounded-button bg-primary text-white hover:bg-primary-hover">
+  Apply Now
+</Button>
+
+// Secondary
+<Button variant="outline" className="rounded-button border-primary text-primary">
+  Learn More
+</Button>
+```
+
+### 6.2 Cards
+
+```tsx
+<Card className="rounded-card bg-bg-card shadow-card border border-border p-6">
+  ...
+</Card>
+```
+
+### 6.3 Pills / Tags
+
+```tsx
+<span className="rounded-pill bg-secondary/10 text-secondary px-3 py-1 text-xs font-medium">
+  Cybersecurity
+</span>
+```
+
+### 6.4 Inputs
+
+```tsx
+<input
+  className="rounded-button bg-bg-card border border-border px-4 py-2 text-text-body
+             focus:outline-none focus:ring-2 focus:ring-primary/30"
+/>
+```
+
+All interactive elements meet **WCAG AA** contrast on the warm page background.
+
+---
+
+## 7. The `useRequest` Data Layer
+
+The frontend uses a custom SWR-based hook for all API interaction. The hook lives in `packages/api-client/use-request.ts` and is the **only** way components should fetch data.
+
+### 7.1 Why a custom hook?
+
+The hook handles:
+- Auto-attaching the Sanctum token from Redux
+- Auto-prefixing `/api/v1/` to URLs
+- Unwrapping the API envelope (`response.data.data`)
+- Detecting paginated responses and exposing pagination state
+- Cursor-style `onLoadMore` / `onLoadPrevious` for infinite lists
+- Auto-logout on `Unauthenticated` errors
+- Surfacing errors via toast notifications
+
+### 7.2 Basic Usage
+
+```tsx
+'use client';
+import { useRequest } from '@wenza/api-client';
+import type { Course } from '@wenza/api-client/types';
+
+export function CourseList() {
+  const { data, isLoading, total } = useRequest<Course[]>('courses');
+
+  if (isLoading) return <Skeleton />;
+
+  return (
+    <>
+      <p className="text-text-muted">{total} courses available</p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {data.map((course) => (
+          <CourseCard key={course.id} course={course} />
+        ))}
+      </div>
+    </>
+  );
+}
+```
+
+### 7.3 Pagination
+
+```tsx
+const {
+  data,
+  isLoading,
+  current_page,
+  last_page,
+  total,
+  onLoadMore,
+  onLoadPrevious,
+} = useRequest<Course[]>('courses', {
+  params: { per_page: 12 },
+});
+```
+
+### 7.4 Filtering
+
+```tsx
+const { data, onChangeParams } = useRequest<Course[]>('courses', {
+  params: { category: 'engineering' },
+});
+
+// Update filter
+<Select onValueChange={(v) => onChangeParams({ category: v })} />
+```
+
+### 7.5 Single Resource
+
+```tsx
+const { data: course } = useRequest<Course>(`courses/${slug}`);
+```
+
+### 7.6 Mutations
+
+```tsx
+'use client';
+import { useMutationRequest } from '@wenza/api-client';
+import { toast } from 'sonner';
+
+export function EnrollButton({ cohortId }: { cohortId: number }) {
+  const { trigger, isMutating } = useMutationRequest('enrollments', 'post');
+
+  const onEnroll = async () => {
+    try {
+      const res = await trigger({ cohort_id: cohortId });
+      toast.success(res.message);
+      // res.data is the new enrollment
+    } catch (e) {
+      // catchError already showed a toast
+    }
+  };
+
+  return (
+    <Button onClick={onEnroll} disabled={isMutating}>
+      {isMutating ? 'Enrolling...' : 'Enroll Now'}
+    </Button>
+  );
+}
+```
+
+### 7.7 Refresh / Revalidate
+
+```tsx
+const { data, onRefresh } = useRequest<Course[]>('courses');
+
+// Manually refresh after a mutation
+await onRefresh();
+
+// Or globally invalidate everything
+import { onReloadData } from '@wenza/api-client';
+await onReloadData();
+```
+
+### 7.8 Hook Configuration Options
+
+```ts
+useRequest('courses', {
+  method: 'get',                // default
+  node: 'data',                 // path to unwrap from response
+  initialValue: [],             // value before first load
+  refreshInterval: 0,           // polling interval ms
+  revalidateOnFocus: true,
+  shouldRetryOnError: false,
+  keepPreviousData: true,       // smooth pagination transitions
+  keepPaginatedData: false,     // append to existing data on load more (infinite scroll)
+  showError: false,             // auto-toast errors
+  goBackOnError: false,         // router.back() on error
+  params: {},                   // query params
+});
+```
+
+---
+
+## 8. API Response Contract
+
+The Laravel API conforms to a strict envelope. The `useRequest` hook depends on this exact shape — if the backend deviates, the frontend breaks.
+
+### 8.1 Success
+
+```json
+{
+  "status": "success",
+  "message": "Course retrieved",
+  "data": { /* resource */ }
+}
+```
+
+The hook surfaces `data` directly. So `useRequest<Course>('courses/foo')` gives you `data: Course`.
+
+### 8.2 Paginated Collection
+
+```json
+{
+  "status": "success",
+  "message": "Records retrieved",
+  "data": {
+    "records": [ /* items */ ],
+    "current_page": 1,
+    "last_page": 5,
+    "per_page": 15,
+    "total": 73,
+    "next_page_url": "...",
+    "prev_page_url": null,
+    "links": [ ... ]
+  }
+}
+```
+
+The hook detects `data.records` and surfaces:
+- `data` → the array of records
+- `current_page`, `last_page`, `per_page`, `total`, `from`, `to`, `next_page_url`, `prev_page_url`, `links` → directly on the response
+
+### 8.3 Error
+
+```json
+{
+  "status": "error",
+  "message": "What went wrong",
+  "errors": { "email": ["Required"] }
+}
+```
+
+401 errors with "Unauthenticated" in the message trigger automatic logout.
+
+### 8.4 Type Definitions
+
+```ts
+// packages/api-client/types/envelope.ts
+export interface SuccessEnvelope<T> {
+  status: 'success';
+  message: string;
+  data: T;
+}
+
+export interface PaginatedData<T> {
+  records: T[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  from: number;
+  to: number;
+  total: number;
+  first_page_url: string;
+  last_page_url: string;
+  next_page_url: string | null;
+  prev_page_url: string | null;
+  path: string;
+  links: Array<{ url: string | null; label: string; active: boolean }>;
+}
+
+export interface ErrorEnvelope {
+  status: 'error';
+  message: string;
+  errors?: Record<string, string[]>;
+}
+```
+
+---
+
+## 9. Auth Flow
+
+### 9.1 Redux Slice
+
+```ts
+// packages/store/slices/auth-slice.ts
+interface AuthState {
+  user: User | null;
+  token: string | null;
+  isAuthenticated: boolean;
+}
+
+const authSlice = createSlice({
+  name: 'auth',
+  initialState: { user: null, token: null, isAuthenticated: false },
+  reducers: {
+    setAuth: (state, action: PayloadAction<{ user: User; token: string }>) => {
+      state.user = action.payload.user;
+      state.token = action.payload.token;
+      state.isAuthenticated = true;
+    },
+    logout: (state) => {
+      state.user = null;
+      state.token = null;
+      state.isAuthenticated = false;
+    },
+  },
+});
+```
+
+The store is persisted to `localStorage` via `redux-persist` so the token survives reloads.
+
+### 9.2 Login
+
+```tsx
+const { trigger } = useMutationRequest('auth/login', 'post');
+const dispatch = useDispatch();
+const router = useRouter();
+
+const onSubmit = async (values: LoginForm) => {
+  const res = await trigger(values);
+  dispatch(setAuth({ user: res.data.user, token: res.data.token }));
+  router.push('/dashboard');
+};
+```
+
+### 9.3 Protected Routes
+
+```tsx
+// apps/app/middleware.ts
+export function middleware(request: NextRequest) {
+  const token = request.cookies.get('auth-token')?.value;
+
+  if (!token && !request.nextUrl.pathname.startsWith('/login')) {
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
+}
+```
+
+For client-side guards, use a simple wrapper:
+
+```tsx
+'use client';
+export function RequireAuth({ children }: { children: ReactNode }) {
+  const isAuth = useSelector((s: RootState) => s.auth.isAuthenticated);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isAuth) router.push('/login');
+  }, [isAuth]);
+
+  if (!isAuth) return null;
+  return <>{children}</>;
+}
+```
+
+### 9.4 Cross-Subdomain SSO
+
+Set the auth cookie with `domain: '.wenza.com'` so all four subdomains share it. In production, the token Redux state is also rehydrated from the same `localStorage` key on each subdomain.
+
+---
+
+## 10. Subdomain Routing
+
+In production, each app deploys to its own Vercel project with a custom domain. In development, they run on different ports (3000–3003).
+
+### 10.1 Vercel Project Setup
+
+| Vercel Project | Domain | Build Command |
 |---|---|---|
-| **Primary** | `#B05010` | CTAs, buttons, active states, links, primary accents |
-| **Primary Hover/Dark** | `#8B3E0D` | Button hover states, pressed states |
-| **Primary Light** | `#D0A050` | Highlights, badges, star ratings, tags, secondary accents |
-| **Secondary** | `#A05020` | Secondary buttons, icons, progress bars, category tags |
-| **Accent Gold/Amber** | `#C8882B` | Premium badges, featured course highlights, notification dots |
-| **Dark Background** | `#1A1008` | Dark sections, footer, hero overlays, dark mode backgrounds |
-| **Deep Brown** | `#3D2010` | Headings, navbar background, card headers, dark text |
-| **Medium Brown** | `#6B4025` | Body text (on light backgrounds), subtitles |
-| **Light Warm Bg** | `#FDF6ED` | Page background (warm off-white with slight warmth) |
-| **Card Background** | `#FFF9F2` | Card surfaces, input fields |
-| **Border/Divider** | `#E8D5C0` | Dividers, card borders, input borders |
-| **Muted Text** | `#8C7A68` | Captions, timestamps, placeholder text |
-| **White** | `#FFFFFF` | Text on dark backgrounds, card backgrounds in dark sections |
-| **Success** | `#2D8B4E` | Completion states, success messages |
-| **Error** | `#C43D2E` | Error states, required field indicators |
+| `wenza-marketing` | `wenza.com` | `pnpm --filter=web build` |
+| `wenza-app` | `app.wenza.com` | `pnpm --filter=app build` |
+| `wenza-certificates` | `certificates.wenza.com` | `pnpm --filter=certificates build` |
+| `wenza-scholarship` | `scholarship.wenza.com` | `pnpm --filter=scholarship build` |
+
+Each project points to the same monorepo and uses Turborepo's remote cache for fast builds.
+
+### 10.2 Cross-App Links
+
+Use the env var URLs, not hardcoded paths:
+
+```tsx
+<Link href={`${process.env.NEXT_PUBLIC_APP_URL}/dashboard`}>Go to Dashboard</Link>
+```
 
 ---
 
-### 🖋 TYPOGRAPHY
+## 11. Sitemap
 
-- **Headings:** Use a bold serif or semi-serif typeface (e.g., **Playfair Display** or **Lora**) to evoke a premium, knowledge-rich feel
-- **Body text:** Use a clean sans-serif (e.g., **Inter**, **DM Sans**, or **Plus Jakarta Sans**)
-- **Logo text "Wenza":** Matches a serif/decorative style — replicate this feel in headings
+### 11.1 Marketing Site (`wenza.com`) — `apps/web`
 
----
+| Route | Purpose |
+|---|---|
+| `/` | Hero, value prop, featured courses, testimonials, CTA |
+| `/courses` | Grid of all 16 programmes, filterable by category |
+| `/courses/[slug]` | Course detail page |
+| `/about` | Mission, story, team, partnerships |
+| `/testimonials` | Aggregated student stories |
+| `/scholarship` | Scholarship overview + link to portal |
+| `/contact` | Support channels, office locations |
+| `/apply` | Primary enrollment form |
+| `/blog` | Optional content marketing |
+| `/legal/terms`, `/legal/privacy` | Legal |
 
-### 🔄 GLOBAL CHANGES (Apply across ALL pages/frames)
+### 11.2 LMS (`app.wenza.com`) — `apps/app`
 
-1. **Logo:** Replace the template's existing logo with the Wenza logo (Africa silhouette with circuit-line patterns in burnt orange/amber/brown tones) everywhere it appears — navbar, footer, favicon, loading screens
-2. **Brand Name:** Replace all instances of the original brand name with **"Wenza"**
-3. **Tagline:** Use → *"Empowering Africa Through Knowledge"* or *"Learn. Grow. Lead."*
-4. **All gradient backgrounds:** Replace with warm gradients using Wenza palette:
-   - Hero gradient: `linear-gradient(135deg, #1A1008 0%, #3D2010 50%, #B05010 100%)`
-   - Soft gradient: `linear-gradient(180deg, #FDF6ED 0%, #FFF9F2 100%)`
-5. **Illustrations/Graphics:** Swap generic illustrations with imagery representing African learners, professionals, and tech education. Use warm-toned overlays on stock photos
-6. **Icons:** Recolor all icons to `#B05010` (primary) or `#6B4025` (secondary)
-7. **Buttons:**
-   - Primary: `bg: #B05010`, `text: #FFFFFF`, `border-radius: 8px`
-   - Secondary/Outline: `border: 2px solid #B05010`, `text: #B05010`
-   - Hover: darken to `#8B3E0D`
-8. **Cards:** `bg: #FFF9F2`, `border: 1px solid #E8D5C0`, `border-radius: 12px`, subtle warm shadow `0 4px 16px rgba(26, 16, 8, 0.08)`
+| Route | Purpose |
+|---|---|
+| `/login`, `/signup` | Auth |
+| `/dashboard` | Enrolments, progress, upcoming sessions |
+| `/courses/[slug]/learn` | Course player (video + content + exercises) |
+| `/courses/[slug]/community` | Cohort discussion |
+| `/assignments` | Submitted + pending |
+| `/calendar` | Live class schedule |
+| `/mentors` | Booking & messages |
+| `/certificates` | Earned certificates |
+| `/jobs` | Internal job board |
+| `/profile` | Account, password, payment history |
 
----
+### 11.3 Certificates (`certificates.wenza.com`) — `apps/certificates`
 
-### 📄 PAGE-BY-PAGE MODIFICATIONS
+| Route | Purpose |
+|---|---|
+| `/` | Verification landing — Certificate ID input |
+| `/verify/[id]` | Public verification result |
+| `/dashboard` | Graduate login → download all certificates |
+| `/dp-generator` | Canvas-based "Wenza Graduate" DP generator |
 
-#### **Hero / Landing Section**
-- Background: Dark warm gradient (`#1A1008 → #3D2010`) or use a high-quality image of African students/professionals with a dark overlay
-- Headline: *"Unlock Your Potential with Wenza"* in `#FFFFFF`
-- Subtext: *"Access world-class courses designed for Africa's next generation of leaders, creators, and innovators"* in `#D0A050`
-- CTA Button: *"Start Learning"* → `bg: #B05010`, `text: #FFFFFF`
-- Secondary CTA: *"Explore Courses"* → outline style with `#D0A050`
-- Add subtle circuit-line decorative patterns (inspired by the logo) as background accents
+### 11.4 Scholarship (`scholarship.wenza.com`) — `apps/scholarship`
 
-#### **Course Categories Section**
-- Category icons: Recolor to `#B05010` with `#FDF6ED` circular backgrounds
-- Category names in `#3D2010`
-- Suggested categories: Technology & AI, Business & Entrepreneurship, Creative Arts, Data Science, Languages, Health & Wellness, Agriculture & Sustainability, Leadership & Governance
-- Hover state: card border changes to `#B05010`, subtle warm glow
-
-#### **Featured/Popular Courses Section**
-- Course cards: `bg: #FFF9F2`, `border: 1px solid #E8D5C0`
-- Course thumbnail overlay on hover: semi-transparent `#B05010` with play icon
-- Price tags: `bg: #D0A050`, `text: #3D2010`
-- "Free" badge: `bg: #2D8B4E`, `text: #FFFFFF`
-- Rating stars: `#D0A050` (amber/gold)
-- Instructor name: `#6B4025`
-- Sample courses:
-  - "Introduction to Python Programming"
-  - "African Business Strategy"
-  - "UI/UX Design Fundamentals"
-  - "Data Analytics for Beginners"
-  - "Digital Marketing Mastery"
-  - "Mobile App Development with Flutter"
-
-#### **Statistics/Trust Section**
-- Background: `#3D2010` (dark brown)
-- Stats text: `#FFFFFF`
-- Stat numbers: `#D0A050` (gold/amber)
-- Sample stats: *"10,000+ Students"* · *"500+ Courses"* · *"50+ Expert Instructors"* · *"30+ African Countries"*
-
-#### **Testimonials Section**
-- Background: `#FDF6ED`
-- Testimonial cards: `bg: #FFFFFF`, `border: 1px solid #E8D5C0`
-- Quote marks: decorative, in `#D0A050`
-- Use diverse African names and photos
-- Star ratings: `#D0A050`
-
-#### **Instructors/Team Section**
-- Instructor cards with warm photo frames
-- Name: `#3D2010`, Title: `#6B4025`
-- Social icons: `#B05010`
-- Circular avatar border: `3px solid #D0A050`
-
-#### **Newsletter/CTA Section**
-- Background: gradient `#B05010 → #8B3E0D`
-- Headline: `#FFFFFF` — *"Stay Ahead. Subscribe to Wenza"*
-- Input field: `bg: rgba(255,255,255,0.15)`, `border: 1px solid rgba(255,255,255,0.3)`, `placeholder text: rgba(255,255,255,0.6)`
-- Subscribe button: `bg: #D0A050`, `text: #3D2010`
-
-#### **Footer**
-- Background: `#1A1008`
-- Wenza logo (light version on dark)
-- Link text: `#E8D5C0`, hover → `#D0A050`
-- Social media icons: `#D0A050`
-- Copyright: *"© 2026 Wenza. Empowering Africa Through Knowledge."*
-- Footer columns: About, Courses, Resources, Support, Legal
-
-#### **Navigation Bar**
-- Background: `#FFFFFF` (light) or `#1A1008` (dark variant)
-- Logo: Wenza logo (left-aligned)
-- Nav links: `#3D2010`, hover → `#B05010` with underline accent
-- "Sign Up" button: `bg: #B05010`, `text: #FFFFFF`
-- "Log In" link: `text: #B05010`
+| Route | Purpose |
+|---|---|
+| `/` | Scholarship pitch, eligibility, FAQs |
+| `/apply` | Application form |
+| `/status/[ref]` | Status lookup |
 
 ---
 
-### ✨ DESIGN ACCENTS & PATTERNS
+## 12. Course Detail Pages
 
-- Add **subtle circuit-line patterns** (inspired by the Wenza logo's Africa-circuit motif) as decorative background elements in hero sections and dividers
-- Use **warm dot-grid or topographic-line patterns** as subtle section backgrounds
-- Add a subtle **Africa continent silhouette** watermark in light sections (at 3-5% opacity using `#D0A050`)
-- Corner accents on cards can use a small circuit-line flourish in `#E8D5C0`
+The `/courses/[slug]` page is the **single most important conversion surface** on the marketing site. Every page must include these sections in order:
+
+1. **Hero** — Course title (Urbanist 64px), one-line value prop, duration pill, format pill, price + scholarship badge, primary CTA "Apply Now"
+2. **Overview** — 2–3 paragraph description, who it's for, prerequisites
+3. **What You'll Learn** — Bulleted outcomes (6–10 items, each with a check icon in `text-success`)
+4. **Curriculum** — Accordion of modules. Each module shows lessons + projects. Use the shared `CurriculumAccordion` component
+5. **Tools & Technologies** — Logo grid (e.g., for Backend Dev: Node.js, Express, PostgreSQL, MongoDB, Git, Docker)
+6. **Career Outcomes** — `SalaryTable` with Nigeria + Global columns
+7. **Mentors** — `MentorCard` grid for lead instructors
+8. **Schedule & Pricing** — `PricingCard` with cohort dates, full price, scholarship price, payment plans
+9. **FAQ** — `FAQAccordion`
+10. **Final CTA** — Full-bleed deep-brown section with primary CTA + "Talk to an advisor" link
+
+Course content is authored in MDX at `apps/web/content/courses/[slug].mdx`. The page reads the MDX + fetches dynamic data (cohorts, prices) from the API.
+
+### 12.1 16 Course Slugs
+
+```
+software-development
+backend-development
+frontend-development
+devops-engineering
+data-science
+data-analytics
+ai-automation
+product-design
+graphics-design
+content-creation
+product-management
+project-management
+virtual-assistant
+digital-marketing
+cybersecurity
+[reserved]    ← Cloud Engineering or Mobile Development
+```
 
 ---
 
-### 📐 DESIGN SYSTEM COMPONENTS TO UPDATE
+## 13. Certificate Portal
 
-- [ ] Color styles → rename & update to Wenza palette
-- [ ] Text styles → update with chosen fonts
-- [ ] Button components → primary, secondary, ghost, disabled states
-- [ ] Input field components → default, focus (`border: #B05010`), error, disabled
-- [ ] Card components → course card, testimonial card, instructor card
-- [ ] Badge components → free, popular, new, premium
-- [ ] Navigation component → desktop & mobile
-- [ ] Footer component
-- [ ] Icon set → recolor to brand palette
+### 13.1 Verification Page (`/verify/[id]`)
+
+Server-rendered with ISR (revalidate every 60 seconds for the cache, but the underlying API caches for 5 minutes):
+
+```tsx
+// apps/certificates/app/verify/[id]/page.tsx
+export const revalidate = 60;
+
+export default async function VerifyPage({ params }: { params: { id: string } }) {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/verify/${params.id}`, {
+    next: { revalidate: 60 },
+  });
+
+  if (!res.ok) {
+    return <InvalidCertificate id={params.id} />;
+  }
+
+  const { data } = await res.json();
+
+  return <ValidCertificate certificate={data} />;
+}
+```
+
+The valid state shows a green check (`text-success`), holder name, course title, issuance date, and a Wenza watermark. The invalid state shows a red error and a CTA to contact support.
+
+### 13.2 DP Generator
+
+Client-side `<canvas>` (or `fabric.js`) tool that lets graduates upload a photo and overlay a branded "Wenza Graduate — [Course]" frame. Output is a 1080×1080 PNG ready for Instagram/LinkedIn. No backend involvement.
 
 ---
+
+## 14. Component Inventory
+
+All shared in `packages/ui/components/`. Per-app components live in `apps/{app}/components/`.
+
+### 14.1 Marketing Components
+- `Navbar` (transparent on hero, solid on scroll)
+- `Footer` (multi-column, dark BG `#1A1008`)
+- `Hero` (with subtle Framer Motion accent)
+- `CourseCard` (image, category pill, title, value prop, CTA)
+- `CourseGrid` (responsive: 1 / 2 / 3 / 4 cols)
+- `TestimonialCard`
+- `TestimonialMarquee` (infinite-scroll using Framer Motion — reuse the `WhatChanges` pattern)
+- `PartnerLogoCloud`
+- `FAQAccordion`
+- `PricingCard` (with scholarship variant)
+- `StatsBar` (uptime, students taught, certificates issued)
+- `CTASection` (full-bleed deep-brown bg with primary CTA)
+- `MentorCard`
+- `SalaryTable`
+- `CurriculumAccordion`
+
+### 14.2 LMS Components
+- `DashboardSidebar`
+- `CourseProgressRing`
+- `LessonPlayer` (video + transcript + notes)
+- `AssignmentSubmitForm`
+- `LiveSessionCard` (with "Join Session" button in `bg-success`)
+- `ChatPanel`
+- `CalendarView`
+- `CertificateCard` (with download + share)
+
+### 14.3 Form Components
+- `Input`, `Textarea`, `Select`, `Checkbox`, `RadioGroup`
+- `FormField` wrapper with label + error message
+- `SubmitButton` with loading state
+- `FileUpload` with drag-and-drop
+
+---
+
+## 15. Accessibility
+
+- All interactive elements reachable by keyboard
+- Visible focus rings (use `--color-primary` at 30% alpha: `focus:ring-2 focus:ring-primary/30`)
+- `aria-label` on icon-only buttons
+- Form fields have associated `<label>` elements
+- Error messages announced via `aria-live="polite"`
+- Colour contrast ≥ 4.5:1 for body text, ≥ 3:1 for large text
+- Skip-to-content link in navbar
+- `prefers-reduced-motion` respected for all Framer Motion animations:
+
+```tsx
+const shouldReduceMotion = useReducedMotion();
+<motion.div animate={shouldReduceMotion ? {} : { y: [0, -10, 0] }} />
+```
+
+---
+
+## 16. SEO
+
+Every page exports `metadata`:
+
+```tsx
+// apps/web/app/courses/[slug]/page.tsx
+export async function generateMetadata({ params }): Promise<Metadata> {
+  const course = await getCourse(params.slug);
+  return {
+    title: `${course.title} Course | Wenza`,
+    description: course.description,
+    openGraph: {
+      title: `${course.title} Course | Wenza`,
+      description: course.description,
+      images: [`/og/${course.slug}.png`],
+      url: `https://wenza.com/courses/${course.slug}`,
+      siteName: 'Wenza',
+    },
+    twitter: { card: 'summary_large_image' },
+  };
+}
+```
+
+OG images follow the established preference: simple white background with centred Wenza logo and course title.
+
+Also generate `sitemap.xml` and `robots.txt` for the marketing site.
+
+---
+
+## 17. Testing
+
+### 17.1 Stack
+
+- **Vitest** for utilities and hooks
+- **React Testing Library** for components
+- **Playwright** for E2E flows
+
+### 17.2 Running Tests
+
+```bash
+pnpm test                  # Vitest unit tests
+pnpm test:e2e              # Playwright E2E
+pnpm test:coverage         # With coverage
+```
+
+### 17.3 Critical E2E Flows
+
+Playwright should cover:
+1. Visitor lands on `/`, browses courses, opens a course detail page
+2. Visitor signs up, verifies email, logs in
+3. Authenticated user enrols in a cohort, completes Paystack checkout (mocked)
+4. Authenticated user marks lessons complete and reaches 100% progress
+5. Visitor verifies a known-valid certificate ID
+6. Visitor verifies a known-invalid certificate ID
+
+---
+
+## 18. Deployment
+
+### 18.1 Vercel
+
+Each app is its own Vercel project. All four point to this monorepo with a different `--filter` build command.
+
+```bash
+# Vercel build command per project
+pnpm install --frozen-lockfile && pnpm --filter=web build
+pnpm install --frozen-lockfile && pnpm --filter=app build
+pnpm install --frozen-lockfile && pnpm --filter=certificates build
+pnpm install --frozen-lockfile && pnpm --filter=scholarship build
+```
+
+Set the **Root Directory** in each Vercel project to the corresponding app folder (e.g., `apps/web`).
+
+### 18.2 Environment Variables
+
+Set the same env vars across all four Vercel projects (they share the same API).
+
+### 18.3 Turborepo Remote Cache
+
+Connect Vercel to Turborepo's remote cache to avoid rebuilding unchanged packages:
+
+```bash
+npx turbo login
+npx turbo link
+```
+
+### 18.4 CI/CD
+
+```yaml
+# .github/workflows/ci.yml
+name: CI
+on: [pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+      - uses: actions/setup-node@v4
+        with: { node-version: '20', cache: 'pnpm' }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+```
+
+Vercel auto-deploys on merge to `main`.
+
+---
+
+## 19. Environment Variables
+
+```env
+# .env.local (development)
+NEXT_PUBLIC_API_URL=http://127.0.0.1:8000/api/v1
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_APP_URL=http://localhost:3001
+NEXT_PUBLIC_CERT_URL=http://localhost:3002
+NEXT_PUBLIC_SCHOLARSHIP_URL=http://localhost:3003
+
+NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY=pk_test_...
+NEXT_PUBLIC_SENTRY_DSN=
+NEXT_PUBLIC_PLAUSIBLE_DOMAIN=wenza.com
+```
+
+```env
+# Production
+NEXT_PUBLIC_API_URL=https://api.wenza.com/api/v1
+NEXT_PUBLIC_SITE_URL=https://wenza.com
+NEXT_PUBLIC_APP_URL=https://app.wenza.com
+NEXT_PUBLIC_CERT_URL=https://certificates.wenza.com
+NEXT_PUBLIC_SCHOLARSHIP_URL=https://scholarship.wenza.com
+
+NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY=pk_live_...
+NEXT_PUBLIC_SENTRY_DSN=
+NEXT_PUBLIC_PLAUSIBLE_DOMAIN=wenza.com
+```
+
+`packages/api-client/base-request.ts` consumes `NEXT_PUBLIC_API_URL` via `@/config/constants`. The base URL resolves to whatever's in this env var; do not hardcode it elsewhere.
+
+---
+
+## 20. Conventions & Code Style
+
+- **TypeScript strict mode** — no `any` without an `eslint-disable-next-line` comment + reason
+- **Functional components only** — no class components
+- **Server Components by default** — opt into `"use client"` only when needed (state, effects, hooks, browser APIs)
+- **Co-locate** components with the page that owns them; promote to `packages/ui` only when used by 2+ apps
+- **Tailwind utility classes** for styling — no CSS modules, no styled-components
+- **kebab-case** filenames (`course-card.tsx`, not `CourseCard.tsx`)
+- **PascalCase** component names
+- **camelCase** for variables, functions, hooks
+- **UK English** in user-facing copy
+- **Always use `useRequest` / `useMutationRequest`** — never `fetch` or raw Axios in components
+- **Always use design tokens** — never `bg-[#B05010]`; use `bg-primary`
+- **Always test the happy path** — every form, every CTA, every navigation
+
+### 20.1 Pull Request Checklist
+
+Before opening a PR:
+
+- [ ] `pnpm lint` passes
+- [ ] `pnpm typecheck` passes
+- [ ] `pnpm test` passes
+- [ ] Visual changes screenshot in PR description
+- [ ] Mobile viewport tested (Chrome DevTools, ≤ 375px width)
+- [ ] Keyboard navigation works
+- [ ] No off-token colours, radii, or shadows
+- [ ] No hardcoded API URLs
+- [ ] No `console.log` left in code
+
+---
+
+## Appendix: Common Commands
+
+```bash
+# Add a shadcn component
+pnpm --filter=ui dlx shadcn-ui@latest add dialog
+
+# Add a dependency to a specific app
+pnpm --filter=web add date-fns
+
+# Add a dev dependency to the workspace root
+pnpm add -Dw eslint-plugin-foo
+
+# Run a single Vitest file
+pnpm --filter=web test course-card
+
+# Generate a fresh Playwright report
+pnpm --filter=app exec playwright test --ui
+
+# Bust the SWR cache from anywhere
+import { onReloadData } from '@wenza/api-client';
+await onReloadData();
+
+# Build everything
+pnpm build
+
+# Build one app
+pnpm --filter=app build
+```
+
+---
+
+For the project vision and brand, see [`../README.md`](../README.md).
+For the Laravel API this frontend consumes, see [`../wenza-api/README.md`](../wenza-api/README.md).

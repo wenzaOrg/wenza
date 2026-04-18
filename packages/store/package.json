@@ -1,0 +1,25 @@
+{
+  "name": "@wenza/store",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "scripts": {
+    "lint": "eslint . --ext .ts,.tsx",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^2.0.0",
+    "redux-persist": "^6.0.0",
+    "@wenza/api-client": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@wenza/eslint-config": "workspace:*",
+    "react-redux": "^9.2.0",
+    "typescript": "^5.0.0"
+  }
+}
