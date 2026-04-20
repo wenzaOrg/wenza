@@ -12,7 +12,7 @@ const NAV_LINKS = [
   { label: 'About', href: '/about' },
   { label: 'Testimonials', href: '/testimonials' },
   { label: 'Contact', href: '/contact' },
-  { label: 'Scholarship', href: '/scholarship' },
+  { label: 'Scholarship', href: process.env.NEXT_PUBLIC_SCHOLARSHIP_URL || 'https://scholarship.wenza.com' },
 ];
 
 export function Navbar() {

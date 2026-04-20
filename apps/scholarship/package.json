@@ -10,14 +10,18 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@marsidev/react-turnstile": "^1.5.0",
     "@wenza/api-client": "workspace:*",
     "@wenza/store": "workspace:*",
     "@wenza/ui": "workspace:*",
+    "lucide-react": "^0.400.0",
     "next": "14.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.72.1",
     "react-redux": "^9.2.0",
-    "sonner": "^1.4.0"
+    "sonner": "^1.4.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

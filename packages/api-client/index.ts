@@ -6,3 +6,4 @@ export type { UseRequestOptions, UseRequestReturn, RequestMethod } from './use-r
 export type { UseMutationRequestReturn } from './use-mutation-request';
 export type * from './types';
 export * from './schemas/lead';
+export * from './schemas/scholarship';

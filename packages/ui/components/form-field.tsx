@@ -40,24 +40,7 @@ export function FormField({
   return (
     <div className={cn('flex flex-col space-y-2', className)} {...props}>
       <Label htmlFor={name}>{label}</Label>
-      
-      {/* Automagically inject aria attributes into the child input */}
-      {React.isValidElement(children)
-        ? React.cloneElement(
-            children as React.ReactElement<{
-              id?: string;
-              name?: string;
-              'aria-invalid'?: boolean;
-              'aria-describedby'?: string;
-            }>,
-            {
-              id: name,
-              name,
-              'aria-invalid': !!error,
-              'aria-describedby': describedBy,
-            }
-          )
-        : children}
+      {children}
 
       {error && (
         <p id={errorId} className="text-sm font-medium text-error">

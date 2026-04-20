@@ -11,11 +11,13 @@ const config: Config = {
   content: [
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
-    // Scope @wenza/ui to clear src directories only to avoid node_modules scanning
     path.join(uiPackagePath, 'components/**/*.{js,ts,jsx,tsx}'),
     path.join(uiPackagePath, 'lib/**/*.{js,ts,jsx,tsx}'),
     path.join(uiPackagePath, 'index.ts'),
     path.join(uiPackagePath, 'fonts.ts'),
+  ],
+  plugins: [
+    require('@tailwindcss/typography'),
   ],
 };
 

@@ -66,15 +66,25 @@ export default function ApplyPage() {
     resolver: zodResolver(leadSubmissionSchema),
     mode: 'onChange',
     defaultValues: {
-      wants_scholarship: false,
+      full_name: '',
+      email: '',
+      phone: '',
       age: undefined,
+      employment_status: 'unemployed',
+      education_level: 'ssce',
+      goals: '',
+      course_id: undefined,
+      wants_scholarship: false,
       guardian_consent: false,
+      turnstile_token: '',
     },
   });
 
-  const formValues = watch();
+  const courseId = watch('course_id');
+  const wantsScholarship = watch('wants_scholarship');
+  const goals = watch('goals');
+  const age = watch('age');
 
-  // Set initial course if slug is provided
   React.useEffect(() => {
     if (courses && courseSlug) {
       const course = courses.find(c => c.slug === courseSlug);
@@ -122,7 +132,7 @@ export default function ApplyPage() {
     }
   };
 
-  const selectedCourse = courses?.find(c => c.id === formValues.course_id);
+  const selectedCourse = React.useMemo(() => courses?.find(c => c.id === courseId), [courses, courseId]);
 
   return (
     <main className="min-h-screen bg-bg-dark py-12 md:py-24">
@@ -196,6 +206,7 @@ export default function ApplyPage() {
                   <FormField label="Full Name" name="full_name" error={errors.full_name?.message}>
                     <Input 
                       {...register('full_name')} 
+                      id="full_name"
                       placeholder="e.g. John Doe" 
                       className="bg-white/5 border-white/10 h-12"
                       autoFocus
@@ -204,6 +215,7 @@ export default function ApplyPage() {
                   <FormField label="Email Address" name="email" error={errors.email?.message}>
                     <Input 
                       {...register('email')} 
+                      id="email"
                       type="email" 
                       placeholder="john@example.com" 
                       className="bg-white/5 border-white/10 h-12"
@@ -214,6 +226,7 @@ export default function ApplyPage() {
                   <FormField label="Phone Number" name="phone" error={errors.phone?.message}>
                     <Input 
                       {...register('phone')} 
+                      id="phone"
                       placeholder="08012345678" 
                       className="bg-white/5 border-white/10 h-12" 
                     />
@@ -221,6 +234,7 @@ export default function ApplyPage() {
                   <FormField label="Age" name="age" error={errors.age?.message}>
                     <Input 
                       {...register('age', { valueAsNumber: true })} 
+                      id="age"
                       type="number" 
                       placeholder="25" 
                       className="bg-white/5 border-white/10 h-12"
@@ -228,7 +242,7 @@ export default function ApplyPage() {
                   </FormField>
                 </div>
 
-                {formValues.age && formValues.age < 18 && (
+                {age && age < 18 && (
                   <div className="p-5 rounded-xl border border-warning/20 bg-warning/5 animate-in zoom-in-95 duration-300">
                     <p className="text-sm text-warning mb-4 leading-relaxed font-medium">
                       You are under 18. We require confirmation that you have permission from a parent or guardian to enrol.
@@ -269,7 +283,7 @@ export default function ApplyPage() {
                       control={control}
                       render={({ field }) => (
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger className="bg-white/5 border-white/10 h-12" error={!!errors.employment_status}>
+                          <SelectTrigger id="employment_status" className="bg-white/5 border-white/10 h-12" error={!!errors.employment_status}>
                             <SelectValue placeholder="Select status" />
                           </SelectTrigger>
                           <SelectContent>
@@ -289,7 +303,7 @@ export default function ApplyPage() {
                       control={control}
                       render={({ field }) => (
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger className="bg-white/5 border-white/10 h-12" error={!!errors.education_level}>
+                          <SelectTrigger id="education_level" className="bg-white/5 border-white/10 h-12" error={!!errors.education_level}>
                             <SelectValue placeholder="Select level" />
                           </SelectTrigger>
                           <SelectContent>
@@ -310,10 +324,11 @@ export default function ApplyPage() {
                   label="What do you hope to achieve?" 
                   name="goals" 
                   error={errors.goals?.message}
-                  helperText={`${formValues.goals?.length || 0} / 2000 characters`}
+                  helperText={`${goals?.length || 0} / 2000 characters`}
                 >
                   <Textarea 
                     {...register('goals')}
+                    id="goals"
                     placeholder="Tell us about your professional goals and how this programme helps you achieve them..." 
                     className="bg-white/5 border-white/10 min-h-[160px] resize-none pt-4"
                   />
@@ -331,10 +346,10 @@ export default function ApplyPage() {
                     control={control}
                     render={({ field }) => (
                       <Select 
-                        onValueChange={(val) => field.onChange(parseInt(val))} 
-                        value={field.value?.toString()}
+                        onValueChange={(val) => field.onChange(val ? parseInt(val) : undefined)} 
+                        value={field.value?.toString() || ""}
                       >
-                        <SelectTrigger className="bg-white/5 border-white/10 h-14" error={!!errors.course_id}>
+                        <SelectTrigger id="course_id" className="bg-white/5 border-white/10 h-14" error={!!errors.course_id}>
                           <SelectValue placeholder="Select a programme" />
                         </SelectTrigger>
                         <SelectContent>
@@ -349,7 +364,7 @@ export default function ApplyPage() {
                   />
                 </FormField>
 
-                <div className="flex items-center justify-between p-6 rounded-2xl border border-white/5 bg-white/[0.01]">
+                <div className="flex items-center justify-between p-6 rounded-2xl border border-white/5 bg-white/[0.01] cursor-pointer" onClick={() => setValue('wants_scholarship', !wantsScholarship, { shouldValidate: true })}>
                   <div className="space-y-1">
                     <p className="text-white font-bold">Apply for Scholarship</p>
                     <p className="text-xs text-white/40">Check this if you require financial assistance.</p>
@@ -362,6 +377,7 @@ export default function ApplyPage() {
                         checked={field.value} 
                         onCheckedChange={field.onChange}
                         className="h-6 w-6"
+                        onClick={(e) => e.stopPropagation()}
                       />
                     )}
                   />
@@ -375,10 +391,10 @@ export default function ApplyPage() {
                 <h2 className="text-xl font-bold text-white mb-6">Final Review</h2>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <ReviewItem label="Name" value={formValues.full_name} />
-                  <ReviewItem label="Email" value={formValues.email} />
+                  <ReviewItem label="Name" value={watch('full_name')} />
+                  <ReviewItem label="Email" value={watch('email')} />
                   <ReviewItem label="Programme" value={selectedCourse?.title || 'General Application'} />
-                  <ReviewItem label="Scholarship" value={formValues.wants_scholarship ? 'Yes' : 'No'} />
+                  <ReviewItem label="Scholarship" value={wantsScholarship ? 'Yes' : 'No'} />
                 </div>
 
                 <div className="space-y-4">
