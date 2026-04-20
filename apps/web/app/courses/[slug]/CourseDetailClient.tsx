@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { MDXRemote } from 'next-mdx-remote/nocache';
 import { 
   Clock, 
   Users, 
@@ -26,6 +25,7 @@ import { motion } from 'framer-motion';
 
 interface Props {
   course: Course;
+  aboutRendered: React.ReactNode;
 }
 
 const fadeIn = {
@@ -35,7 +35,7 @@ const fadeIn = {
   transition: { duration: 0.5 }
 };
 
-export default function CourseDetailClient({ course }: Props) {
+export default function CourseDetailClient({ course, aboutRendered }: Props) {
   return (
     <div className="flex flex-col min-h-screen bg-bg-page pt-20">
       {/* 1. Hero Section */}
@@ -106,10 +106,14 @@ export default function CourseDetailClient({ course }: Props) {
         {/* 3. About Programme */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
           <div className="lg:col-span-7 space-y-8">
-            <SectionHeading title="About the Programme" />
-            <div className="prose prose-lg prose-brown max-w-none text-text-body/90 leading-relaxed">
-              <MDXRemote source={course.about_mdx} />
-            </div>
+            {aboutRendered && (
+              <>
+                <SectionHeading title="About the Programme" />
+                <div className="prose prose-lg prose-brown max-w-none text-text-body/90 leading-relaxed">
+                  {aboutRendered}
+                </div>
+              </>
+            )}
           </div>
           <div className="lg:col-span-5">
             <Card className="p-8 bg-white border-border shadow-card sticky top-24">

@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { BaseRequest } from '@wenza/api-client';
 import { Course, Envelope } from '@wenza/api-client/types';
 import { MDXRemote } from 'next-mdx-remote/rsc';
-import CourseDetailClient from './course-detail-client';
+import CourseDetailClient from './CourseDetailClient';
 
 interface Props {
   params: {
@@ -79,7 +79,7 @@ export default async function CoursePage({ params }: Props) {
       />
       <CourseDetailClient 
         course={course} 
-        aboutMdx={<MDXRemote source={course.about_mdx} />} 
+        aboutRendered={course.about_mdx ? <MDXRemote source={course.about_mdx} /> : null}
       />
     </>
   );
