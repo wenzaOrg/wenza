@@ -17,6 +17,9 @@ const config: Config = {
     path.join(uiPackagePath, 'index.ts'),
     path.join(uiPackagePath, 'fonts.ts'),
   ],
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
 };
 
 export default config;

@@ -7,20 +7,39 @@ export interface Cohort {
   status: 'upcoming' | 'active' | 'completed';
 }
 
-export interface Lesson {
-  id: number;
-  title: string;
-  order: number;
-  content_type: 'video' | 'text' | 'quiz';
-  duration_minutes: number | null;
+export interface ToolsAndTechnologies {
+  name: string;
+  logo_url: string;
 }
 
-export interface Module {
-  id: number;
+export interface CareerOutcome {
+  role: string;
+  nigeria_ngn: string;
+  us_usd: string;
+  global_usd: string | null;
+}
+
+export interface CurriculumItem {
+  week: number;
   title: string;
-  order: number;
-  description: string | null;
-  lessons: Lesson[];
+  topics: string[];
+}
+
+export interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+export interface Mentor {
+  id: number;
+  name: string;
+  first_name: string;
+  last_name: string;
+  title: string;
+  avatar_url: string | null;
+  bio: string | null;
+  linkedin_url: string | null;
+  years_experience: number;
 }
 
 export interface Course {
@@ -36,8 +55,20 @@ export interface Course {
   scholarship_price_ngn: number | null;
   thumbnail_url: string | null;
   is_published: boolean;
-  modules: Module[];
-  cohorts: Cohort[];
+  is_featured: boolean;
   created_at: string;
   updated_at: string;
+
+  // PR 3 Detail Fields
+  curriculum: CurriculumItem[];
+  outcomes: string[];
+  about_mdx: string;
+  faqs: FAQItem[];
+  tools_and_technologies: ToolsAndTechnologies[];
+  career_outcomes: CareerOutcome[];
+  prerequisites: string | null;
+
+  // Relations
+  mentors: Mentor[];
+  cohorts: Cohort[];
 }

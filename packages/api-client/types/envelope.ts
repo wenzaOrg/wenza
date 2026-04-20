@@ -1,3 +1,9 @@
+export interface Envelope<T> {
+  status: 'success' | 'error';
+  message: string;
+  data: T;
+}
+
 /**
  * API Response envelope types per wenza/README.md §8.4.
  * These are the canonical TypeScript definitions for the Wenza API contract.

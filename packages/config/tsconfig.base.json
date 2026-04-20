@@ -14,7 +14,7 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "baseUrl": ".",
-    "types": ["node", "react", "react-dom"],
+    "types": ["node", "react"],
     "jsxImportSource": "react",
     "typeRoots": ["./node_modules/@types", "../../node_modules/@types"],
     "paths": {

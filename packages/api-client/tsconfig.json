@@ -3,7 +3,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "outDir": "dist",
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "types": ["node", "react"]
   },
   "include": [
     "**/*.ts",
