@@ -6,6 +6,7 @@
   "types": "./index.ts",
   "exports": {
     ".": "./index.ts",
+    "./package.json": "./package.json",
     "./styles/tokens.css": "./styles/tokens.css",
     "./tailwind/preset": "./tailwind/preset.ts",
     "./fonts": "./fonts.ts",
@@ -16,19 +17,26 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "next": "^14.0.0",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "next": "14.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "@wenza/eslint-config": "workspace:*",
+    "next": "14.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "tailwindcss": "^3.4.0",
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@radix-ui/react-checkbox": "^1.0.0",
+    "@radix-ui/react-label": "^2.0.0",
+    "@radix-ui/react-select": "^2.0.0",
+    "@radix-ui/react-slot": "^1.0.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "framer-motion": "^11.0.0",

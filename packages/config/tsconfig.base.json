@@ -14,6 +14,9 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "baseUrl": ".",
+    "types": ["node", "react", "react-dom"],
+    "jsxImportSource": "react",
+    "typeRoots": ["./node_modules/@types", "../../node_modules/@types"],
     "paths": {
       "@wenza/*": ["packages/*/index.ts"]
     }

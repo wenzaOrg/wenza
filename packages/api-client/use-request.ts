@@ -28,6 +28,7 @@ export interface UseRequestOptions<T> extends SWRConfiguration {
 export interface UseRequestReturn<T> {
   data: T;
   isLoading: boolean;
+  loading: boolean;
   error: unknown;
   mutate: KeyedMutator<SuccessEnvelope<T | PaginatedData<T extends Array<infer I> ? I : T>>>;
   // Pagination (only meaningful when response is a paginated collection)
@@ -59,7 +60,7 @@ export interface UseRequestReturn<T> {
  * @example
  * const { data, isLoading, total } = useRequest<Course[]>('courses');
  */
-export function useRequest<T>(
+export function useRequest<T = unknown>(
   url: string | null,
   options: UseRequestOptions<T> = {}
 ): UseRequestReturn<T> {
@@ -166,6 +167,7 @@ export function useRequest<T>(
   return {
     data: resolvedData ?? (initialValue as T),
     isLoading,
+    loading: isLoading,
     error,
     mutate: mutate as UseRequestReturn<T>['mutate'],
     // Pagination metadata

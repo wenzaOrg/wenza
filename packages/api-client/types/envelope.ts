@@ -10,6 +10,11 @@ export interface SuccessEnvelope<T> {
   data: T;
 }
 
+export type ApiEnvelope<T> = SuccessEnvelope<T>;
+
+export type PaginatedEnvelope<T> = ApiEnvelope<PaginatedData<T>>;
+
+
 export interface PaginatedData<T> {
   records: T[];
   current_page: number;
