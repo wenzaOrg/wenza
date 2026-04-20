@@ -13,7 +13,7 @@ export const leadSubmissionSchema = z.object({
   turnstile_token: z.string().min(1, 'Please complete the security check'),
   guardian_consent: z.boolean().optional(),
 }).refine(
-  (data: any) => data.age >= 18 || data.guardian_consent === true,
+  (data) => data.age >= 18 || data.guardian_consent === true,
   { message: 'Guardian consent required for applicants under 18', path: ['guardian_consent'] }
 );
 

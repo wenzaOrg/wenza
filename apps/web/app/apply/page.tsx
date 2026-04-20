@@ -17,7 +17,6 @@ import {
   SelectTrigger, 
   SelectValue,
   Checkbox,
-  Pill,
   cn
 } from '@wenza/ui';
 import { 
@@ -29,7 +28,6 @@ import {
   User,
   GraduationCap,
   BookOpen,
-  ArrowRight,
   Send
 } from 'lucide-react';
 import Link from 'next/link';
@@ -63,7 +61,7 @@ export default function ApplyPage() {
     watch,
     setValue,
     trigger: validateStep,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm<LeadSubmission>({
     resolver: zodResolver(leadSubmissionSchema),
     mode: 'onChange',
@@ -88,13 +86,10 @@ export default function ApplyPage() {
 
   const handleNext = async () => {
     const fieldsToValidate = getFieldsForStep(step);
-    const isStepValid = await validateStep(fieldsToValidate as any);
+    const isStepValid = await validateStep(fieldsToValidate);
     
     if (isStepValid) {
       setStep((s) => (s + 1) as Step);
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`apply_form_step_completed: step ${step}`);
-      }
       window.scrollTo(0, 0);
     }
   };
@@ -118,15 +113,12 @@ export default function ApplyPage() {
     setServerError(null);
     try {
       const res = await trigger(data);
-      if (process.env.NODE_ENV === 'development') {
-        console.log('apply_form_submitted', res);
+      if (res?.data?.reference_code) {
+        router.push(`/thank-you?reference=${res.data.reference_code}`);
       }
-      router.push(`/thank-you?reference=${res.data.reference_code}`);
-    } catch (err: any) {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('apply_form_error', err);
-      }
-      setServerError(err.message || 'An unexpected error occurred. Please try again.');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'An unexpected error occurred. Please try again.';
+      setServerError(message);
     }
   };
 
@@ -245,7 +237,7 @@ export default function ApplyPage() {
                       <Controller
                         name="guardian_consent"
                         control={control}
-                        render={({ field }: any) => (
+                        render={({ field }) => (
                           <Checkbox 
                             id="guardian_consent" 
                             checked={field.value} 
@@ -275,7 +267,7 @@ export default function ApplyPage() {
                     <Controller
                       name="employment_status"
                       control={control}
-                      render={({ field } : any) => (
+                      render={({ field }) => (
                         <Select onValueChange={field.onChange} value={field.value}>
                           <SelectTrigger className="bg-white/5 border-white/10 h-12" error={!!errors.employment_status}>
                             <SelectValue placeholder="Select status" />
@@ -295,7 +287,7 @@ export default function ApplyPage() {
                     <Controller
                       name="education_level"
                       control={control}
-                      render={({ field } : any) => (
+                      render={({ field }) => (
                         <Select onValueChange={field.onChange} value={field.value}>
                           <SelectTrigger className="bg-white/5 border-white/10 h-12" error={!!errors.education_level}>
                             <SelectValue placeholder="Select level" />
@@ -337,7 +329,7 @@ export default function ApplyPage() {
                   <Controller
                     name="course_id"
                     control={control}
-                    render={({ field } : any) => (
+                    render={({ field }) => (
                       <Select 
                         onValueChange={(val) => field.onChange(parseInt(val))} 
                         value={field.value?.toString()}
@@ -365,7 +357,7 @@ export default function ApplyPage() {
                   <Controller
                     name="wants_scholarship"
                     control={control}
-                    render={({ field } : any) => (
+                    render={({ field }) => (
                       <Checkbox 
                         checked={field.value} 
                         onCheckedChange={field.onChange}
