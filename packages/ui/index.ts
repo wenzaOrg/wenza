@@ -2,6 +2,7 @@
 export { urbanist, dmSans } from './fonts';
 export { formatNaira, formatUsd } from './lib/format';
 export { focusRing } from './lib/classes';
+export { cn } from './lib/utils';
 export { Navbar } from './components/navbar';
 export { Footer } from './components/footer';
 export { CourseCard } from './components/course-card';

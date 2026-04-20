@@ -5,3 +5,4 @@ export { parseNetworkError, parseValidationErrors, catchError, onReloadData } fr
 export type { UseRequestOptions, UseRequestReturn, RequestMethod } from './use-request';
 export type { UseMutationRequestReturn } from './use-mutation-request';
 export type * from './types';
+export * from './schemas/lead';
