@@ -7,11 +7,18 @@ import { Button } from './button';
 import { focusRing } from '../lib/classes';
 import { cn } from '../lib/utils';
 
+const getSiteUrl = () => {
+  if (typeof window === 'undefined') return process.env.NEXT_PUBLIC_MAIN_SITE_URL || '';
+  return process.env.NEXT_PUBLIC_MAIN_SITE_URL || '';
+};
+
+const MAIN_SITE_URL = getSiteUrl();
+
 const NAV_LINKS = [
-  { label: 'Courses', href: '/courses' },
-  { label: 'About', href: '/about' },
-  { label: 'Testimonials', href: '/testimonials' },
-  { label: 'Contact', href: '/contact' },
+  { label: 'Courses', href: `${MAIN_SITE_URL}/courses` },
+  { label: 'About', href: `${MAIN_SITE_URL}/about` },
+  { label: 'Testimonials', href: `${MAIN_SITE_URL}/testimonials` },
+  { label: 'Contact', href: `${MAIN_SITE_URL}/contact` },
   { label: 'Scholarship', href: process.env.NEXT_PUBLIC_SCHOLARSHIP_URL || 'https://scholarship.wenza.com' },
 ];
 

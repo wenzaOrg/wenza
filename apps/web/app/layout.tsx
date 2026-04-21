@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { urbanist, dmSans } from '@wenza/ui/fonts';
-import { Navbar, Footer } from '@wenza/ui';
+import { Navbar, Footer, CookieConsent } from '@wenza/ui';
 import { StoreProvider } from '@wenza/store';
 import { Toaster } from 'sonner';
 import './globals.css';
@@ -38,6 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </main>
           </div>
           <Footer />
+          <CookieConsent mainSiteUrl={process.env.NEXT_PUBLIC_MAIN_SITE_URL} />
           <Toaster richColors position="top-right" />
         </StoreProvider>
       </body>

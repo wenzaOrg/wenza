@@ -7,3 +7,4 @@ export type { UseMutationRequestReturn } from './use-mutation-request';
 export type * from './types';
 export * from './schemas/lead';
 export * from './schemas/scholarship';
+export * from './schemas/contact-message';

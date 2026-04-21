@@ -21,3 +21,4 @@ export * from './components/skeleton';
 export * from './components/accordion';
 export * from './components/course-curriculum';
 export * from './components/mentor-card';
+export { CookieConsent } from './components/cookie-consent';

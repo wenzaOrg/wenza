@@ -1,30 +1,32 @@
 import * as React from 'react';
 import Link from 'next/link';
 
+const MAIN_SITE_URL = process.env.NEXT_PUBLIC_MAIN_SITE_URL || '';
+
 const FOOTER_LINKS = {
   company: [
-    { label: 'About Us', href: '/about' },
-    { label: 'Careers', href: '/careers' },
-    { label: 'Contact', href: '/contact' },
-    { label: 'Partners', href: '/partners' },
+    { label: 'About Us', href: `${MAIN_SITE_URL}/about` },
+    { label: 'Careers', href: `${MAIN_SITE_URL}/careers` },
+    { label: 'Contact', href: `${MAIN_SITE_URL}/contact` },
+    { label: 'Partners', href: `${MAIN_SITE_URL}/partners` },
   ],
   courses: [
-    { label: 'Software Development', href: '/courses/software-development' },
-    { label: 'Data Science', href: '/courses/data-science' },
-    { label: 'Cybersecurity', href: '/courses/cybersecurity' },
-    { label: 'Cloud Engineering', href: '/courses/cloud-engineering' },
-    { label: 'All Courses', href: '/courses' },
+    { label: 'Software Development', href: `${MAIN_SITE_URL}/courses/software-development` },
+    { label: 'Data Science', href: `${MAIN_SITE_URL}/courses/data-science` },
+    { label: 'Cybersecurity', href: `${MAIN_SITE_URL}/courses/cybersecurity` },
+    { label: 'Cloud Engineering', href: `${MAIN_SITE_URL}/courses/cloud-engineering` },
+    { label: 'All Courses', href: `${MAIN_SITE_URL}/courses` },
   ],
   resources: [
-    { label: 'Community', href: '/community' },
-    { label: 'Scholarships', href: '/scholarship' },
-    { label: 'Blog', href: '/blog' },
-    { label: 'Help Centre', href: '/help' },
+    { label: 'Community', href: `${MAIN_SITE_URL}/community` },
+    { label: 'Scholarships', href: process.env.NEXT_PUBLIC_SCHOLARSHIP_URL || '/scholarship' },
+    { label: 'Blog', href: `${MAIN_SITE_URL}/blog` },
+    { label: 'Help Centre', href: `${MAIN_SITE_URL}/help` },
   ],
   legal: [
-    { label: 'Terms of Service', href: '/terms' },
-    { label: 'Privacy Policy', href: '/privacy' },
-    { label: 'Cookie Policy', href: '/cookies' },
+    { label: 'Terms of Service', href: `${MAIN_SITE_URL}/terms` },
+    { label: 'Privacy Policy', href: `${MAIN_SITE_URL}/privacy` },
+    { label: 'Cookie Policy', href: `${MAIN_SITE_URL}/cookies` },
   ],
 };
 

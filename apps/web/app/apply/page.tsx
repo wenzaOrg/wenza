@@ -5,25 +5,25 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Turnstile } from '@marsidev/react-turnstile';
-import { 
-  Button, 
-  Card, 
-  Input, 
-  FormField, 
-  Textarea, 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
+import {
+  Button,
+  Card,
+  Input,
+  FormField,
+  Textarea,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
   SelectValue,
   Checkbox,
   cn
 } from '@wenza/ui';
-import { 
-  ChevronLeft, 
-  ChevronRight, 
-  Check, 
-  Loader2, 
+import {
+  ChevronLeft,
+  ChevronRight,
+  Check,
+  Loader2,
   ShieldCheck,
   User,
   GraduationCap,
@@ -61,7 +61,7 @@ export default function ApplyPage() {
     watch,
     setValue,
     trigger: validateStep,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<LeadSubmission>({
     resolver: zodResolver(leadSubmissionSchema),
     mode: 'onChange',
@@ -97,7 +97,7 @@ export default function ApplyPage() {
   const handleNext = async () => {
     const fieldsToValidate = getFieldsForStep(step);
     const isStepValid = await validateStep(fieldsToValidate);
-    
+
     if (isStepValid) {
       setStep((s) => (s + 1) as Step);
       window.scrollTo(0, 0);
@@ -139,8 +139,8 @@ export default function ApplyPage() {
       <div className="container max-w-2xl px-4">
         {/* Navigation / Header */}
         <div className="flex items-center justify-between mb-8 md:mb-12">
-          <Link 
-            href={courseSlug ? `/courses/${courseSlug}` : '/courses'} 
+          <Link
+            href={courseSlug ? `/courses/${courseSlug}` : '/courses'}
             className="inline-flex items-center gap-2 text-white/40 hover:text-white transition-colors text-sm"
           >
             <ChevronLeft size={16} />
@@ -164,8 +164,8 @@ export default function ApplyPage() {
         <div className="mb-12" role="progressbar" aria-valuenow={step} aria-valuemin={1} aria-valuemax={4}>
           <div className="hidden md:flex justify-between relative">
             <div className="absolute top-1/2 left-0 w-full h-0.5 bg-white/5 -translate-y-1/2 z-0" />
-            <div 
-              className="absolute top-1/2 left-0 h-0.5 bg-brand-primary -translate-y-1/2 z-0 transition-all duration-500 ease-in-out" 
+            <div
+              className="absolute top-1/2 left-0 h-0.5 bg-brand-primary -translate-y-1/2 z-0 transition-all duration-500 ease-in-out"
               style={{ width: `${(step - 1) * 33.33}%` }}
             />
             {STEPS.map((s) => (
@@ -195,49 +195,55 @@ export default function ApplyPage() {
 
         <Card className="p-6 md:p-10 border-white/10 bg-white/[0.02] shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-brand-primary/5 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-          
+
           <form className="space-y-8 relative z-10" onSubmit={handleSubmit(onSubmit)}>
-            
+
             {/* Step 1: Personal Details */}
             {step === 1 && (
               <section className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <h2 className="text-xl font-bold text-white mb-6">Personal Details</h2>
                 <div className="grid md:grid-cols-2 gap-6">
                   <FormField label="Full Name" name="full_name" error={errors.full_name?.message}>
-                    <Input 
-                      {...register('full_name')} 
+                    <Input
+                      {...register('full_name')}
                       id="full_name"
-                      placeholder="e.g. John Doe" 
+                      placeholder="e.g. John Doe"
                       className="bg-white/5 border-white/10 h-12"
                       autoFocus
                     />
                   </FormField>
                   <FormField label="Email Address" name="email" error={errors.email?.message}>
-                    <Input 
-                      {...register('email')} 
+                    <Input
+                      {...register('email')}
                       id="email"
-                      type="email" 
-                      placeholder="john@example.com" 
+                      type="email"
+                      placeholder="john@example.com"
                       className="bg-white/5 border-white/10 h-12"
                     />
                   </FormField>
                 </div>
                 <div className="grid md:grid-cols-2 gap-6">
                   <FormField label="Phone Number" name="phone" error={errors.phone?.message}>
-                    <Input 
-                      {...register('phone')} 
+                    <Input
+                      {...register('phone')}
                       id="phone"
-                      placeholder="08012345678" 
-                      className="bg-white/5 border-white/10 h-12" 
+                      placeholder="08012345678"
+                      className="bg-white/5 border-white/10 h-12"
                     />
                   </FormField>
                   <FormField label="Age" name="age" error={errors.age?.message}>
-                    <Input 
-                      {...register('age', { valueAsNumber: true })} 
+                    <Input
+                      {...register('age', { valueAsNumber: true })}
                       id="age"
-                      type="number" 
-                      placeholder="25" 
+                      type="text"
+                      placeholder="25"
                       className="bg-white/5 border-white/10 h-12"
+                      onKeyPress={(e) => {
+                        const charCode = e.which;
+                        if (charCode < 48 || charCode > 57) {
+                          e.preventDefault();
+                        }
+                      }}
                     />
                   </FormField>
                 </div>
@@ -252,9 +258,9 @@ export default function ApplyPage() {
                         name="guardian_consent"
                         control={control}
                         render={({ field }) => (
-                          <Checkbox 
-                            id="guardian_consent" 
-                            checked={field.value} 
+                          <Checkbox
+                            id="guardian_consent"
+                            checked={field.value}
                             onCheckedChange={field.onChange}
                             className="mt-1"
                           />
@@ -320,16 +326,16 @@ export default function ApplyPage() {
                     />
                   </FormField>
                 </div>
-                <FormField 
-                  label="What do you hope to achieve?" 
-                  name="goals" 
+                <FormField
+                  label="What do you hope to achieve?"
+                  name="goals"
                   error={errors.goals?.message}
                   helperText={`${goals?.length || 0} / 2000 characters`}
                 >
-                  <Textarea 
+                  <Textarea
                     {...register('goals')}
                     id="goals"
-                    placeholder="Tell us about your professional goals and how this programme helps you achieve them..." 
+                    placeholder="Tell us about your professional goals and how this programme helps you achieve them..."
                     className="bg-white/5 border-white/10 min-h-[160px] resize-none pt-4"
                   />
                 </FormField>
@@ -345,8 +351,8 @@ export default function ApplyPage() {
                     name="course_id"
                     control={control}
                     render={({ field }) => (
-                      <Select 
-                        onValueChange={(val) => field.onChange(val ? parseInt(val) : undefined)} 
+                      <Select
+                        onValueChange={(val) => field.onChange(val ? parseInt(val) : undefined)}
                         value={field.value?.toString() || ""}
                       >
                         <SelectTrigger id="course_id" className="bg-white/5 border-white/10 h-14" error={!!errors.course_id}>
@@ -364,7 +370,7 @@ export default function ApplyPage() {
                   />
                 </FormField>
 
-                <div className="flex items-center justify-between p-6 rounded-2xl border border-white/5 bg-white/[0.01] cursor-pointer" onClick={() => setValue('wants_scholarship', !wantsScholarship, { shouldValidate: true })}>
+                <div className="flex items-center justify-between p-6 rounded-2xl border border-white/5 bg-white/[0.01]">
                   <div className="space-y-1">
                     <p className="text-white font-bold">Apply for Scholarship</p>
                     <p className="text-xs text-white/40">Check this if you require financial assistance.</p>
@@ -373,11 +379,10 @@ export default function ApplyPage() {
                     name="wants_scholarship"
                     control={control}
                     render={({ field }) => (
-                      <Checkbox 
-                        checked={field.value} 
+                      <Checkbox
+                        checked={field.value}
                         onCheckedChange={field.onChange}
                         className="h-6 w-6"
-                        onClick={(e) => e.stopPropagation()}
                       />
                     )}
                   />
@@ -389,7 +394,7 @@ export default function ApplyPage() {
             {step === 4 && (
               <section className="space-y-8 animate-in fade-in zoom-in-95 duration-500">
                 <h2 className="text-xl font-bold text-white mb-6">Final Review</h2>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <ReviewItem label="Name" value={watch('full_name')} />
                   <ReviewItem label="Email" value={watch('email')} />
@@ -400,8 +405,8 @@ export default function ApplyPage() {
                 <div className="space-y-4">
                   <p className="text-xs font-bold text-white/30 uppercase tracking-widest">Security Check</p>
                   <div className="flex justify-center md:justify-start">
-                    <Turnstile 
-                      siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!} 
+                    <Turnstile
+                      siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
                       onSuccess={(token) => setValue('turnstile_token', token, { shouldValidate: true })}
                       options={{ theme: 'dark' }}
                     />
@@ -422,9 +427,9 @@ export default function ApplyPage() {
             {/* Navigation Buttons */}
             <div className="flex flex-col-reverse md:flex-row gap-4 pt-8">
               {step > 1 && (
-                <Button 
-                  type="button" 
-                  variant="secondary" 
+                <Button
+                  type="button"
+                  variant="secondary"
                   onClick={handleBack}
                   className="flex-1 h-14 text-base"
                   disabled={isMutating}
@@ -432,22 +437,22 @@ export default function ApplyPage() {
                   Back
                 </Button>
               )}
-              
+
               {step < 4 ? (
-                <Button 
-                  type="button" 
-                  variant="primary" 
+                <Button
+                  type="button"
+                  variant="primary"
                   onClick={handleNext}
                   className={cn("flex-1 h-14 text-base", step === 1 && "w-full")}
                 >
                   Continue <ChevronRight className="ml-2 h-5 w-5" />
                 </Button>
               ) : (
-                <Button 
-                  type="submit" 
-                  variant="primary" 
+                <Button
+                  type="submit"
+                  variant="primary"
                   className="flex-1 h-14 text-base font-bold shadow-xl shadow-brand-primary/20"
-                  disabled={isMutating}
+                  disabled={isMutating || !isValid}
                 >
                   {isMutating ? (
                     <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Submitting...</>
@@ -461,9 +466,16 @@ export default function ApplyPage() {
         </Card>
 
         {/* Footer info */}
-        <p className="text-center text-white/20 text-xs mt-12 leading-relaxed max-w-sm mx-auto">
-          By submitting this application, you agree to our Terms of Service and Privacy Policy. 
-          Your information is encrypted and handled securely.
+        <p className="text-center text-white/20 text-xs mt-12 leading-relaxed max-w-md mx-auto">
+          By submitting this application, you agree to our{' '}
+          <Link href="/terms" className="underline hover:text-primary transition-colors">
+            Terms of Service
+          </Link>{' '}
+          and{' '}
+          <Link href="/privacy" className="underline hover:text-primary transition-colors">
+            Privacy Policy
+          </Link>.
+          Your personal information will be handled in accordance with our privacy practices.
         </p>
       </div>
     </main>

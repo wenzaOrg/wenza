@@ -383,7 +383,7 @@ export default function ScholarshipApplyPage() {
                   </FormField>
                 </div>
 
-                <div className="flex items-center justify-between p-6 rounded-3xl border border-primary/10 bg-primary/5 hover:bg-primary/[0.08] transition-colors cursor-pointer group/job" onClick={() => setValue('wants_job_placement', !wantsJobPlacement, { shouldValidate: true })}>
+                <div className="flex items-center justify-between p-6 rounded-3xl border border-primary/10 bg-primary/5">
                   <div className="space-y-1">
                     <p className="text-text-heading font-black text-lg">Job Placement Interest</p>
                     <p className="text-sm text-text-muted opacity-70">Check if you’d like us to help you find a job after graduation.</p>
@@ -396,7 +396,6 @@ export default function ScholarshipApplyPage() {
                         checked={field.value} 
                         onCheckedChange={field.onChange}
                         className="h-8 w-8 rounded-xl ring-primary/20"
-                        onClick={(e) => e.stopPropagation()}
                       />
                     )}
                   />
@@ -489,7 +488,15 @@ export default function ScholarshipApplyPage() {
         </Card>
 
         <p className="text-center text-text-muted/40 text-xs mt-16 font-bold tracking-tight">
-          Safe & Secure. By submitting, you agree to our <a href="https://wenza.com/terms" className="underline hover:text-primary">Terms</a>.
+          By submitting this scholarship application, you agree to our{' '}
+          <Link href={`${process.env.NEXT_PUBLIC_MAIN_SITE_URL || 'http://localhost:3000'}/terms`} className="underline hover:text-primary transition-colors">
+            Terms of Service
+          </Link>{' '}
+          and{' '}
+          <Link href={`${process.env.NEXT_PUBLIC_MAIN_SITE_URL || 'http://localhost:3000'}/privacy`} className="underline hover:text-primary transition-colors">
+            Privacy Policy
+          </Link>. 
+          Your personal information will be handled in accordance with our privacy practices.
         </p>
       </div>
     </main>
