@@ -42,6 +42,7 @@ export interface ButtonProps
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, isLoading = false, children, ...props }, ref) => {
     if (process.env.NODE_ENV !== 'production' && asChild && isLoading) {
+      // eslint-disable-next-line no-console
       console.log('[Button] `isLoading` is ignored when `asChild` is true. Render your own loading state inside the child element.');
     }
 

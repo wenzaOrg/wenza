@@ -15,11 +15,10 @@ const getSiteUrl = () => {
 const MAIN_SITE_URL = getSiteUrl();
 
 const NAV_LINKS = [
-  { label: 'Courses', href: `${MAIN_SITE_URL}/courses` },
-  { label: 'About', href: `${MAIN_SITE_URL}/about` },
-  { label: 'Testimonials', href: `${MAIN_SITE_URL}/testimonials` },
-  { label: 'Contact', href: `${MAIN_SITE_URL}/contact` },
+  { label: 'Programmes', href: `${MAIN_SITE_URL}/courses` },
+  { label: 'Mentors', href: `${MAIN_SITE_URL}/mentors` },
   { label: 'Scholarship', href: process.env.NEXT_PUBLIC_SCHOLARSHIP_URL || 'https://scholarship.wenza.com' },
+  { label: 'About', href: `${MAIN_SITE_URL}/about` },
 ];
 
 export function Navbar() {

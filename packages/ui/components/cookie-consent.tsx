@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Cookie } from 'lucide-react';
 import Link from 'next/link';
-import { cn } from '../lib/utils';
 
 interface CookieConsentProps {
   mainSiteUrl?: string;

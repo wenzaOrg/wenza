@@ -22,6 +22,7 @@ import {
 import { Course } from '@wenza/api-client/types';
 import { formatNaira } from '@wenza/ui/lib/format';
 import { motion } from 'framer-motion';
+import { displayMentorName, displayMentorCompany } from '../../../lib/mentor-display';
 
 interface Props {
   course: Course;
@@ -195,11 +196,12 @@ export default function CourseDetailClient({ course, aboutRendered }: Props) {
             {course.mentors.map((mentor) => (
               <MentorCard 
                 key={mentor.id} 
-                name={mentor.name}
+                name={displayMentorName(mentor.name)}
                 title={mentor.title}
                 avatar_url={mentor.avatar_url}
                 bio={mentor.bio}
                 linkedin_url={mentor.linkedin_url}
+                company={displayMentorCompany(mentor.company)}
               />
             ))}
           </div>

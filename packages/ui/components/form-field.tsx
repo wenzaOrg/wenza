@@ -35,7 +35,6 @@ export function FormField({
 }: FormFieldProps) {
   const errorId = `${name}-error`;
   const helperId = `${name}-helper`;
-  const describedBy = error ? errorId : helperText ? helperId : undefined;
 
   return (
     <div className={cn('flex flex-col space-y-2', className)} {...props}>

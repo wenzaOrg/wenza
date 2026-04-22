@@ -36,6 +36,7 @@ export interface Mentor {
   first_name: string;
   last_name: string;
   title: string;
+  company: string;
   avatar_url: string | null;
   bio: string | null;
   linkedin_url: string | null;

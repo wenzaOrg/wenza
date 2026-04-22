@@ -84,7 +84,6 @@ export default function ScholarshipApplyPage() {
 
   const courseId = watch('course_id');
   const cohortId = watch('cohort_id');
-  const wantsJobPlacement = watch('wants_job_placement');
   
   // Fetch cohorts for selected course
   const { data: cohorts } = useRequest<Cohort[]>(

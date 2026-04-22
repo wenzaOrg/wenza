@@ -4,29 +4,27 @@ import Link from 'next/link';
 const MAIN_SITE_URL = process.env.NEXT_PUBLIC_MAIN_SITE_URL || '';
 
 const FOOTER_LINKS = {
-  company: [
-    { label: 'About Us', href: `${MAIN_SITE_URL}/about` },
-    { label: 'Careers', href: `${MAIN_SITE_URL}/careers` },
-    { label: 'Contact', href: `${MAIN_SITE_URL}/contact` },
-    { label: 'Partners', href: `${MAIN_SITE_URL}/partners` },
-  ],
-  courses: [
+  programmes: [
     { label: 'Software Development', href: `${MAIN_SITE_URL}/courses/software-development` },
     { label: 'Data Science', href: `${MAIN_SITE_URL}/courses/data-science` },
     { label: 'Cybersecurity', href: `${MAIN_SITE_URL}/courses/cybersecurity` },
     { label: 'Cloud Engineering', href: `${MAIN_SITE_URL}/courses/cloud-engineering` },
-    { label: 'All Courses', href: `${MAIN_SITE_URL}/courses` },
+    { label: 'Browse all', href: `${MAIN_SITE_URL}/courses` },
   ],
-  resources: [
-    { label: 'Community', href: `${MAIN_SITE_URL}/community` },
-    { label: 'Scholarships', href: process.env.NEXT_PUBLIC_SCHOLARSHIP_URL || '/scholarship' },
-    { label: 'Blog', href: `${MAIN_SITE_URL}/blog` },
-    { label: 'Help Centre', href: `${MAIN_SITE_URL}/help` },
+  company: [
+    { label: 'About', href: `${MAIN_SITE_URL}/about` },
+    { label: 'Mentors', href: `${MAIN_SITE_URL}/mentors` },
+    { label: 'Contact', href: `${MAIN_SITE_URL}/contact` },
+    { label: 'Testimonials', href: `${MAIN_SITE_URL}/testimonials` },
+  ],
+  apply: [
+    { label: 'Apply for a programme', href: `${MAIN_SITE_URL}/apply` },
+    { label: 'Apply for a scholarship', href: process.env.NEXT_PUBLIC_SCHOLARSHIP_URL || '/scholarship' },
   ],
   legal: [
-    { label: 'Terms of Service', href: `${MAIN_SITE_URL}/terms` },
-    { label: 'Privacy Policy', href: `${MAIN_SITE_URL}/privacy` },
-    { label: 'Cookie Policy', href: `${MAIN_SITE_URL}/cookies` },
+    { label: 'Terms', href: `${MAIN_SITE_URL}/terms` },
+    { label: 'Privacy', href: `${MAIN_SITE_URL}/privacy` },
+    { label: 'Cookies', href: `${MAIN_SITE_URL}/cookies` },
   ],
 };
 
@@ -48,6 +46,21 @@ export function Footer() {
           {/* Links grid */}
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-4 lg:col-span-4">
             <div>
+              <h3 className="font-heading font-semibold text-white">Programmes</h3>
+              <ul className="mt-4 space-y-3">
+                {FOOTER_LINKS.programmes.map((link) => (
+                  <li key={link.label}>
+                    <Link
+                      href={link.href}
+                      className="text-sm text-white/70 transition-colors hover:text-gold outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
               <h3 className="font-heading font-semibold text-white">Company</h3>
               <ul className="mt-4 space-y-3">
                 {FOOTER_LINKS.company.map((link) => (
@@ -63,24 +76,9 @@ export function Footer() {
               </ul>
             </div>
             <div>
-              <h3 className="font-heading font-semibold text-white">Courses</h3>
+              <h3 className="font-heading font-semibold text-white">Apply</h3>
               <ul className="mt-4 space-y-3">
-                {FOOTER_LINKS.courses.map((link) => (
-                  <li key={link.label}>
-                    <Link
-                      href={link.href}
-                      className="text-sm text-white/70 transition-colors hover:text-gold outline-none focus-visible:ring-2 focus-visible:ring-gold"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-heading font-semibold text-white">Resources</h3>
-              <ul className="mt-4 space-y-3">
-                {FOOTER_LINKS.resources.map((link) => (
+                {FOOTER_LINKS.apply.map((link) => (
                   <li key={link.label}>
                     <Link
                       href={link.href}
