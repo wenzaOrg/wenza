@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { ChevronRight, Cookie, Settings2, RefreshCw, Mail } from 'lucide-react';
+import { ChevronRight, Cookie, Settings2, RefreshCw, Mail, LucideIcon } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Cookie Policy',
@@ -140,7 +140,7 @@ function Section({
   children,
 }: {
   id: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
+  icon: LucideIcon;
   title: string;
   children: React.ReactNode;
 }) {

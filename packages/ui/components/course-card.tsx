@@ -14,7 +14,7 @@ export interface CourseCardProps {
     duration_weeks: number;
     format: string;
     price_ngn: number;
-    thumbnail_url?: string;
+    thumbnail_url?: string | null;
   };
 }
 

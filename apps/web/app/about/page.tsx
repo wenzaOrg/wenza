@@ -35,7 +35,7 @@ export default async function AboutPage() {
         </div>
         <div className="mx-auto max-w-4xl text-center relative">
           <div className="text-sm font-medium text-text-muted mb-4">
-            <span>Home</span> <span className="mx-2 text-primary">//</span>{' '}
+            <span>Home</span> <span className="mx-2 text-primary">{"//"}</span>{' '}
             <span className="text-primary">About Us</span>
           </div>
           <h1 className="font-heading text-4xl font-bold text-text-heading md:text-6xl mb-6 leading-[1.1]">

@@ -19,7 +19,7 @@ export default function ThankYouPage({ searchParams }: Props) {
     typeof searchParams.reference === 'string'
       ? searchParams.reference
       : 'APP-XXXXXX';
-  const mainUrl = process.env.NEXT_PUBLIC_MAIN_SITE_URL || '';
+
 
   return (
     <main className="min-h-screen bg-bg-page py-12 md:py-20">

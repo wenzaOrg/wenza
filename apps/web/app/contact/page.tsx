@@ -11,7 +11,6 @@ import {
   Loader2,
   CheckCircle2,
   AlertCircle,
-  Phone,
   MapPin,
 } from 'lucide-react';
 import {
@@ -88,7 +87,7 @@ export default function ContactPage() {
         </div>
         <div className="container mx-auto relative text-center max-w-3xl">
           <div className="text-sm font-medium text-text-muted mb-4">
-            <span>Home</span> <span className="mx-2 text-primary">//</span>{' '}
+            <span>Home</span> <span className="mx-2 text-primary">{"//"}</span>{' '}
             <span className="text-primary">Contact</span>
           </div>
           <h1 className="font-heading text-4xl md:text-6xl font-bold text-text-heading mb-5 leading-[1.1]">

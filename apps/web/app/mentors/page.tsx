@@ -68,7 +68,7 @@ export default async function MentorsPage({
         <div className="container mx-auto relative text-center">
           <div className="text-sm font-medium text-text-muted mb-4">
             <span>Home</span>{' '}
-            <span className="mx-2 text-primary">//</span>{' '}
+            <span className="mx-2 text-primary">{"//"}</span>{' '}
             <span className="text-primary">Mentors</span>
           </div>
           <h1 className="font-heading text-4xl md:text-6xl font-bold text-text-heading mb-5 leading-[1.1]">

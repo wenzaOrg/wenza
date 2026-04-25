@@ -70,8 +70,8 @@ export default function CourseDetailClient({ course, aboutRendered }: Props) {
           <div className="max-w-4xl space-y-6">
             <motion.div {...fadeIn}>
               <div className="text-sm font-medium text-white/60 mb-4">
-                <span>Home</span> <span className="mx-2 text-primary">//</span>{' '}
-                <span>Courses</span> <span className="mx-2 text-primary">//</span>{' '}
+                <span>Home</span> <span className="mx-2 text-primary">{"//"}</span>{' '}
+                <span>Courses</span> <span className="mx-2 text-primary">{"//"}</span>{' '}
                 <span className="text-primary">{course.title}</span>
               </div>
               <Pill

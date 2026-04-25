@@ -399,28 +399,28 @@ export function HomePageClient() {
                     fill="currentColor"
                   />
                   <p className="mb-8 text-lg leading-relaxed text-text-body md:text-xl">
-                    “{testimonials[0]?.quote || testimonials[0]?.body || 'A transformative cohort experience.'}”
+                    “{testimonials[0]?.content || 'A transformative cohort experience.'}”
                   </p>
                   <div className="flex items-center gap-4">
                     {testimonials[0]?.avatar_url ? (
                       <Image
                         src={testimonials[0].avatar_url}
-                        alt={testimonials[0].name || 'Student'}
+                        alt={testimonials[0].author_name || 'Student'}
                         width={56}
                         height={56}
                         className="rounded-full border-2 border-gold object-cover"
                       />
                     ) : (
                       <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
-                        {(testimonials[0]?.name || 'WS').charAt(0)}
+                        {(testimonials[0]?.author_name || 'WS').charAt(0)}
                       </div>
                     )}
                     <div>
                       <div className="font-bold text-text-heading">
-                        {testimonials[0]?.name || 'Wenza Student'}
+                        {testimonials[0]?.author_name || 'Wenza Student'}
                       </div>
                       <div className="text-sm text-text-muted">
-                        {testimonials[0]?.role || 'Graduate'}
+                        {testimonials[0]?.author_role || 'Graduate'}
                       </div>
                     </div>
                   </div>
@@ -469,14 +469,12 @@ export function HomePageClient() {
               { name: 'Amazon', url: 'https://www.vectorlogo.zone/logos/amazon/amazon-ar21.svg' },
             ].map((p, i) => (
               <div key={i} className="relative h-8 w-24 md:h-12 md:w-32 flex items-center justify-center grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all">
-                <img
+                <Image
                   src={p.url}
                   alt={p.name}
-                  className="h-full w-auto object-contain"
-                  onError={(e) => {
-                    // Fallback if URL fails
-                    (e.target as HTMLImageElement).src = `https://cdn.simpleicons.org/${p.name.toLowerCase()}`;
-                  }}
+                  fill
+                  className="object-contain"
+                  unoptimized
                 />
               </div>
             ))}
