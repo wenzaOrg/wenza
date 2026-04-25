@@ -1,13 +1,12 @@
 import * as React from 'react';
 import Link from 'next/link';
-import { 
-  CheckCircle2, 
-  Users, 
-  Calendar, 
-  BookText, 
-  ChevronRight,
+import {
+  CheckCircle2,
+  Users,
+  ArrowRight,
+  BookOpen,
+  Clock,
   Mail,
-  ArrowRight
 } from 'lucide-react';
 import { Card, Button } from '@wenza/ui';
 
@@ -16,128 +15,198 @@ interface Props {
 }
 
 export default function ThankYouPage({ searchParams }: Props) {
-  const reference = typeof searchParams.reference === 'string' ? searchParams.reference : 'LEAD-XXXXXX';
+  const reference =
+    typeof searchParams.reference === 'string'
+      ? searchParams.reference
+      : 'APP-XXXXXX';
+  const mainUrl = process.env.NEXT_PUBLIC_MAIN_SITE_URL || '';
 
   return (
-    <main className="min-h-screen bg-bg-page flex flex-col">
-      {/* Hero Section */}
-      <section className="bg-bg-deep-brown text-white pt-24 pb-16 md:pt-40 md:pb-32 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/10 to-transparent pointer-events-none" />
-        <div className="container px-4 text-center relative z-10">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-success/20 rounded-full mb-8 animate-in zoom-in-50 duration-700">
-            <CheckCircle2 className="w-10 h-10 text-success" />
+    <main className="min-h-screen bg-bg-page py-12 md:py-20">
+      <div className="container mx-auto max-w-3xl px-6 md:px-20">
+        {/* Header */}
+        <div className="mb-12 space-y-6 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success/10 text-success">
+            <CheckCircle2 size={32} />
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight">Application Received</h1>
-          <p className="text-xl text-white/70 max-w-2xl mx-auto mb-10 leading-relaxed">
-            Thank you for applying to Wenza Academy. Your journey towards tech mastery starts here.
-          </p>
-          
-          <div className="inline-flex flex-col items-center p-6 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm">
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 mb-2">Reference Code</span>
-            <span className="text-3xl font-mono font-bold tracking-widest text-primary">{reference}</span>
+          <div className="space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+              Application received
+            </p>
+            <h1 className="font-heading text-4xl font-bold leading-tight text-text-heading md:text-5xl">
+              Thank you — we’ve got it.
+            </h1>
+            <p className="mx-auto max-w-xl text-base text-text-muted md:text-lg">
+              Your application to Wenza Academy has been successfully submitted. 
+              Our team reviews every application carefully to ensure a great cohort experience.
+            </p>
           </div>
-          
-          <p className="mt-8 text-white/50 font-medium">
-            We’ll be in touch within 2 business days.
-          </p>
         </div>
-      </section>
 
-      {/* Next Steps Section */}
-      <section className="py-24 container px-4">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-bold text-text-heading mb-12 text-center md:text-left">
-            While you wait...
+        {/* Reference card */}
+        <Card className="mb-10 p-8 md:p-10">
+          <div className="grid gap-6 md:grid-cols-2 md:divide-x md:divide-border">
+            <div className="space-y-2 md:pr-8">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-muted">
+                Application reference
+              </p>
+              <p className="font-mono text-2xl font-bold tracking-[0.15em] text-text-heading md:text-3xl">
+                {reference}
+              </p>
+              <p className="text-sm text-text-muted">
+                Save this for your records.
+              </p>
+            </div>
+            <div className="flex items-center gap-4 md:pl-8">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <Clock size={20} />
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-muted">
+                  Estimated review
+                </p>
+                <p className="font-heading text-lg font-bold text-text-heading">
+                  Within 2 business days
+                </p>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        {/* What happens next */}
+        <section className="mb-10">
+          <h2 className="mb-6 font-heading text-2xl font-bold text-text-heading">
+            What happens next
           </h2>
-          
-          <div className="grid md:grid-cols-3 gap-6">
-            <EngagementCard 
-              icon={<Users className="w-6 h-6" />}
-              title="Join our WhatsApp community"
-              description="Connect with fellow applicants and get instant updates."
-              href={process.env.NEXT_PUBLIC_WHATSAPP_URL!}
-              cta="Join Group"
-            />
-            <EngagementCard 
-              icon={<Calendar className="w-6 h-6" />}
-              title="Book a free info session"
-              description="Got questions? Chat with our admissions team live."
-              href={process.env.NEXT_PUBLIC_CALENDLY_URL!}
-              cta="Schedule Call"
-            />
-            <EngagementCard 
-              icon={<BookText className="w-6 h-6" />}
-              title="Read student stories"
-              description="See how Wenza transformed careers for others like you."
-              href="/testimonials"
-              cta="Read Stories"
-              isInternal
-            />
-          </div>
+          <ol className="space-y-4">
+            {[
+              {
+                title: 'Application review',
+                body: 'Our admissions team will review your profile and background against the programme requirements.',
+              },
+              {
+                title: 'Interview (if shortlisted)',
+                body: 'If shortlisted, we’ll reach out to schedule a brief conversation about your goals and expectations.',
+              },
+              {
+                title: 'Decision & onboarding',
+                body: 'You’ll receive your decision by email. Accepted students are guided through onboarding for the next cohort.',
+              },
+            ].map((s, i) => (
+              <li
+                key={s.title}
+                className="flex gap-4 rounded-card border border-border bg-bg-card p-5"
+              >
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 font-heading text-sm font-bold text-primary">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <div>
+                  <p className="font-semibold text-text-heading">{s.title}</p>
+                  <p className="mt-1 text-sm text-text-body">{s.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
 
-          <div className="mt-20 p-10 bg-bg-card rounded-[2rem] border border-border flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="text-center md:text-left">
-              <h3 className="text-xl font-bold text-text-heading mb-2">Have questions?</h3>
-              <p className="text-text-body/60">Our team is ready to help you with anything you need.</p>
-            </div>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Button variant="secondary" className="gap-2">
-                <Mail className="w-4 h-4" /> Email Admissions
-              </Button>
-              <Link href="/">
-                <Button variant="ghost" className="gap-2">
-                  Back to Homepage <ArrowRight className="w-4 h-4" />
-                </Button>
-              </Link>
-            </div>
+        {/* CTA cards */}
+        <section className="mb-10">
+          <h2 className="mb-6 font-heading text-2xl font-bold text-text-heading">
+            While you wait
+          </h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Link
+              href="/courses"
+              className="group block"
+            >
+              <Card className="flex h-full flex-col p-6 transition-all hover:border-primary/40 hover:shadow-card">
+                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <BookOpen size={20} />
+                </div>
+                <h3 className="mb-1.5 font-heading text-lg font-bold text-text-heading">
+                  Explore programmes
+                </h3>
+                <p className="mb-5 flex-grow text-sm text-text-body">
+                  Browse our range of technical courses and find your perfect fit
+                  while you wait.
+                </p>
+                <span className="inline-flex items-center gap-2 text-sm font-semibold text-primary">
+                  View courses
+                  <ArrowRight
+                    size={16}
+                    className="transition-transform group-hover:translate-x-0.5"
+                  />
+                </span>
+              </Card>
+            </Link>
+
+            <a
+              href={
+                process.env.NEXT_PUBLIC_WHATSAPP_URL ||
+                '#'
+              }
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group block"
+            >
+              <Card className="flex h-full flex-col p-6 transition-all hover:border-success/40 hover:shadow-card">
+                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-success/10 text-success">
+                  <Users size={20} />
+                </div>
+                <h3 className="mb-1.5 font-heading text-lg font-bold text-text-heading">
+                  Join community
+                </h3>
+                <p className="mb-5 flex-grow text-sm text-text-body">
+                  Connect with fellow learners and get the latest updates in our
+                  community group.
+                </p>
+                <span className="inline-flex items-center gap-2 text-sm font-semibold text-success">
+                  Join WhatsApp
+                  <ArrowRight
+                    size={16}
+                    className="transition-transform group-hover:translate-x-0.5"
+                  />
+                </span>
+              </Card>
+            </a>
           </div>
+        </section>
+
+        {/* Support */}
+        <Card className="mb-10 p-6">
+          <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-bg-page text-text-muted">
+                <Mail size={20} />
+              </div>
+              <div>
+                <p className="font-semibold text-text-heading">
+                  Questions about your application?
+                </p>
+                <p className="text-sm text-text-muted">
+                  Reach out and reference your application code.
+                </p>
+              </div>
+            </div>
+            <a
+              href="mailto:admissions@wenza.com"
+              className="text-sm font-semibold text-primary hover:underline"
+            >
+              admissions@wenza.com
+            </a>
+          </div>
+        </Card>
+
+        <div className="text-center">
+          <Link href="/">
+            <Button variant="outline" size="md">
+              Return to Wenza homepage
+              <ArrowRight size={16} className="ml-2" />
+            </Button>
+          </Link>
         </div>
-      </section>
+      </div>
     </main>
   );
 }
 
-function EngagementCard({ 
-  icon, 
-  title, 
-  description, 
-  href, 
-  cta, 
-  isInternal = false 
-}: { 
-  icon: React.ReactNode, 
-  title: string, 
-  description: string, 
-  href: string,
-  cta: string,
-  isInternal?: boolean
-}) {
-  const CardContent = (
-    <Card className="p-8 h-full flex flex-col hover:border-primary/30 transition-all hover:shadow-card-hover group">
-      <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary mb-6 transition-transform group-hover:scale-110">
-        {icon}
-      </div>
-      <h3 className="text-lg font-bold text-text-heading mb-3">{title}</h3>
-      <p className="text-sm text-text-body/70 leading-relaxed mb-8 flex-grow">
-        {description}
-      </p>
-      <div className="flex items-center gap-2 text-primary font-bold text-sm">
-        {cta} <ChevronRight className="w-4 h-4" />
-      </div>
-    </Card>
-  );
-
-  if (isInternal) {
-    return (
-      <Link href={href} className="block h-full">
-        {CardContent}
-      </Link>
-    );
-  }
-
-  return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className="block h-full">
-      {CardContent}
-    </a>
-  );
-}

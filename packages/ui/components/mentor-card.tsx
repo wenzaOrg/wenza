@@ -38,9 +38,11 @@ export const MentorCard: React.FC<MentorCardProps> = ({
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-primary text-2xl font-bold">
-              {name.charAt(0)}
-            </div>
+            <img
+              src="/assets/images/placeholders/default-avatar.png"
+              alt="Default avatar"
+              className="w-full h-full object-cover opacity-50"
+            />
           )}
         </div>
         {linkedin_url && (

@@ -1,88 +1,242 @@
 import { Button, Card } from '@wenza/ui';
-import { ArrowRight, CheckCircle2, GraduationCap, Sparkles, Zap } from 'lucide-react';
+import {
+  ArrowRight,
+  CheckCircle2,
+  GraduationCap,
+  Zap,
+  ShieldCheck,
+  Users,
+} from 'lucide-react';
 import Link from 'next/link';
 
+const VALUE_PROPS = [
+  {
+    icon: CheckCircle2,
+    title: 'Merit based',
+    body: 'Awarded to candidates who demonstrate exceptional passion, curiosity, and potential in their chosen tech track.',
+  },
+  {
+    icon: GraduationCap,
+    title: 'Global access',
+    body: 'Available to applicants worldwide. We prioritise talent from underrepresented regions and communities.',
+  },
+  {
+    icon: Zap,
+    title: 'Instant impact',
+    body: 'Get a decision within four weeks. Once accepted, you start in the next available cohort immediately.',
+  },
+];
+
+const STATS = [
+  { value: '90%', label: 'Of programme fees covered' },
+  { value: '2,000+', label: 'Students supported' },
+  { value: '4 wk', label: 'Decision turnaround' },
+  { value: '98%', label: 'Completion rate' },
+];
+
+const HOW_IT_WORKS = [
+  {
+    step: '01',
+    title: 'Apply online',
+    body: 'Tell us about your background, the programme you want, and why a scholarship would change things for you.',
+  },
+  {
+    step: '02',
+    title: 'Review & interview',
+    body: 'Shortlisted applicants are invited for a brief conversation with the admissions team.',
+  },
+  {
+    step: '03',
+    title: 'Start learning',
+    body: 'Accepted scholars join the next cohort and begin coursework immediately — no fees due upfront.',
+  },
+];
+
 export default function ScholarshipHome() {
-  const mainUrl = 'https://wenza.com';
+  const mainUrl = process.env.NEXT_PUBLIC_MAIN_SITE_URL || 'https://wenza.com';
 
   return (
-    <main className="min-h-screen bg-bg-page relative overflow-hidden">
-      {/* Dynamic Background Elements */}
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
-         <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full animate-pulse" />
-         <div className="absolute top-[20%] -right-[5%] w-[30%] h-[30%] bg-accent-gold/5 blur-[100px] rounded-full animate-pulse delay-700" />
-      </div>
+    <main className="min-h-screen bg-bg-page">
+      {/* Hero */}
+      <section className="border-b border-border bg-bg-card">
+        <div className="mx-auto max-w-[1080px] px-4 py-20 md:py-28">
+          <div className="grid items-center gap-12 md:grid-cols-[1.2fr_1fr]">
+            <div className="space-y-6">
+              <div className="inline-flex items-center gap-2 rounded-pill border border-border bg-bg-page px-3 py-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+                  Wenza Merit Programme · 2026
+                </span>
+              </div>
 
-      <div className="container max-w-6xl mx-auto px-4 pt-32 pb-24 relative z-10 flex flex-col items-center">
-        
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8 animate-in fade-in slide-in-from-top-4 duration-700">
-           <Sparkles className="w-4 h-4 text-primary" />
-           <span className="text-primary font-black text-xs uppercase tracking-widest">Wenza Merit Programme 2026</span>
-        </div>
+              <h1 className="font-heading text-4xl font-bold leading-[1.05] text-text-heading md:text-6xl">
+                Education is a <span className="text-primary">right</span>,
+                <br />
+                not a privilege.
+              </h1>
 
-        {/* Hero Title */}
-        <div className="text-center max-w-4xl space-y-6 mb-16 animate-in fade-in slide-in-from-bottom-6 duration-1000">
-          <h1 className="text-5xl md:text-8xl font-heading font-black text-text-heading tracking-tight leading-[0.9]">
-            Education is a <span className="text-primary">Right</span>,<br/>Not a Privilege.
-          </h1>
-          <p className="text-xl md:text-2xl text-text-muted max-w-2xl mx-auto leading-relaxed font-medium">
-             Our scholarship programme empowers the next generation of tech leaders by removing financial barriers. We cover up to <span className="text-text-heading font-bold italic underline decoration-primary/30 text-decoration-skip-ink-none">90% of programme fees</span>.
-          </p>
-          <div className="pt-8 flex flex-col sm:flex-row items-center justify-center gap-6">
-            <Link href="/apply">
-              <Button variant="primary" size="lg" className="h-16 px-10 text-xl font-black shadow-2xl hover:scale-105 active:scale-95 transition-all">
-                 Apply for Scholarship <ArrowRight className="ml-2 h-6 w-6" />
-              </Button>
-            </Link>
-            <Link href={`${mainUrl}/courses`}>
-               <Button variant="ghost" size="lg" className="h-16 px-10 text-xl font-black hover:bg-bg-card transition-all">
-                  Explore Programmes
-               </Button>
-            </Link>
+              <p className="max-w-xl text-base text-text-body md:text-lg">
+                Our scholarship programme empowers the next generation of tech leaders
+                by removing financial barriers. We cover up to{' '}
+                <span className="font-semibold text-text-heading">
+                  90% of programme fees
+                </span>{' '}
+                for selected applicants.
+              </p>
+
+              <div className="flex flex-col gap-3 pt-2 sm:flex-row">
+                <Link href="/apply">
+                  <Button variant="primary" size="lg">
+                    Apply for scholarship
+                    <ArrowRight size={18} className="ml-2" />
+                  </Button>
+                </Link>
+                <Link href={`${mainUrl}/courses`}>
+                  <Button variant="outline" size="lg">
+                    Explore programmes
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            {/* Hero card */}
+            <Card className="p-8 md:p-10">
+              <div className="mb-6 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <ShieldCheck size={20} />
+                </div>
+                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-text-muted">
+                  Phoenix cohort 2026
+                </span>
+              </div>
+              <h3 className="mb-3 font-heading text-2xl font-bold text-text-heading">
+                Applications now open
+              </h3>
+              <p className="mb-6 text-sm text-text-body">
+                Limited seats. Decisions roll out weekly until cohort fills.
+              </p>
+              <div className="space-y-3 border-t border-border pt-5">
+                {[
+                  ['Programme', 'All Wenza tracks'],
+                  ['Award', 'Up to 90% off'],
+                  ['Eligibility', 'Worldwide, 18+'],
+                  ['Deadline', 'Rolling'],
+                ].map(([k, v]) => (
+                  <div key={k} className="flex justify-between text-sm">
+                    <span className="text-text-muted">{k}</span>
+                    <span className="font-medium text-text-heading">{v}</span>
+                  </div>
+                ))}
+              </div>
+            </Card>
           </div>
         </div>
+      </section>
 
-        {/* Value Props */}
-        <div className="grid md:grid-cols-3 gap-8 w-full animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-300 fill-mode-both">
-           <Card className="p-10 border-border bg-bg-card/50 backdrop-blur-lg hover:border-primary/30 transition-all group overflow-hidden h-full flex flex-col">
-             <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-primary/5 blur-3xl rounded-full group-hover:bg-primary/10 transition-colors" />
-             <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-8 group-hover:scale-110 transition-transform shrink-0">
-                <CheckCircle2 size={32} />
-             </div>
-             <h3 className="text-2xl font-black text-text-heading mb-4 leading-tight">Merit Based</h3>
-             <p className="text-text-muted leading-relaxed font-medium flex-grow">Awarded to candidates who demonstrate exceptional passion, curiosity, and potential in their chosen tech track.</p>
-           </Card>
-
-           <Card className="p-10 border-border bg-bg-card/50 backdrop-blur-lg hover:border-accent-gold/30 transition-all group overflow-hidden h-full flex flex-col">
-             <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-accent-gold/5 blur-3xl rounded-full group-hover:bg-accent-gold/10 transition-colors" />
-             <div className="w-14 h-14 bg-accent-gold/10 rounded-2xl flex items-center justify-center text-accent-gold mb-8 group-hover:scale-110 transition-transform shrink-0">
-                <GraduationCap size={32} />
-             </div>
-             <h3 className="text-2xl font-black text-text-heading mb-4 leading-tight">Global Access</h3>
-             <p className="text-text-muted leading-relaxed font-medium flex-grow">Available to applicants worldwide. We prioritise talent from underrepresented regions and communities.</p>
-           </Card>
-
-           <Card className="p-10 border-border bg-bg-card/50 backdrop-blur-lg hover:border-primary/30 transition-all group overflow-hidden h-full flex flex-col">
-             <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-primary/5 blur-3xl rounded-full group-hover:bg-primary/10 transition-colors" />
-             <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-8 group-hover:scale-110 transition-transform shrink-0">
-                <Zap size={32} />
-             </div>
-             <h3 className="text-2xl font-black text-text-heading mb-4 leading-tight">Instant Impact</h3>
-             <p className="text-text-muted leading-relaxed font-medium flex-grow">Get a decision within 4 weeks. Once accepted, you start learning in the next available cohort immediately.</p>
-           </Card>
+      {/* Stats */}
+      <section className="border-b border-border bg-bg-page">
+        <div className="mx-auto max-w-[1080px] px-4 py-12">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4">
+            {STATS.map((s) => (
+              <div key={s.label} className="text-center md:text-left">
+                <p className="font-heading text-3xl font-bold text-text-heading md:text-4xl">
+                  {s.value}
+                </p>
+                <p className="mt-1 text-sm text-text-muted">{s.label}</p>
+              </div>
+            ))}
+          </div>
         </div>
+      </section>
 
-        {/* Footer Text */}
-        <div className="mt-24 text-center space-y-4 opacity-40 animate-in fade-in duration-1000 delay-1000 fill-mode-both">
-           <p className="font-black text-sm uppercase tracking-[0.3em] text-text-muted">Applications for Phoenix 2026 are now open</p>
-           <div className="flex flex-wrap justify-center gap-x-8 gap-y-2">
-              <span className="font-bold">Trusted by 2,000+ Students</span>
-              <span className="font-bold">98% Success Rate</span>
-           </div>
+      {/* Value props */}
+      <section className="bg-bg-page">
+        <div className="mx-auto max-w-[1080px] px-4 py-20">
+          <div className="mb-12 max-w-2xl">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+              Why apply
+            </p>
+            <h2 className="font-heading text-3xl font-bold text-text-heading md:text-4xl">
+              A scholarship designed for ambitious learners.
+            </h2>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            {VALUE_PROPS.map((p) => (
+              <Card key={p.title} className="p-8">
+                <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <p.icon size={22} />
+                </div>
+                <h3 className="mb-2 font-heading text-xl font-bold text-text-heading">
+                  {p.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-text-body">{p.body}</p>
+              </Card>
+            ))}
+          </div>
         </div>
+      </section>
 
-      </div>
+      {/* How it works */}
+      <section className="border-y border-border bg-bg-card">
+        <div className="mx-auto max-w-[1080px] px-4 py-20">
+          <div className="mb-12 max-w-2xl">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+              How it works
+            </p>
+            <h2 className="font-heading text-3xl font-bold text-text-heading md:text-4xl">
+              From application to first class in three steps.
+            </h2>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            {HOW_IT_WORKS.map((s) => (
+              <div
+                key={s.step}
+                className="rounded-card border border-border bg-bg-page p-8"
+              >
+                <p className="mb-4 font-heading text-sm font-semibold text-primary">
+                  {s.step}
+                </p>
+                <h3 className="mb-2 font-heading text-xl font-bold text-text-heading">
+                  {s.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-text-body">{s.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="bg-bg-page">
+        <div className="mx-auto max-w-[1080px] px-4 py-20">
+          <Card className="overflow-hidden bg-bg-deep-brown text-white">
+            <div className="grid items-center gap-8 p-10 md:grid-cols-[1fr_auto] md:p-14">
+              <div className="space-y-3">
+                <div className="inline-flex items-center gap-2 rounded-pill bg-white/10 px-3 py-1">
+                  <Users size={14} className="text-gold" />
+                  <span className="text-xs font-semibold uppercase tracking-[0.18em] text-gold">
+                    Limited seats
+                  </span>
+                </div>
+                <h2 className="font-heading text-3xl font-bold leading-tight md:text-4xl">
+                  Ready to start your journey?
+                </h2>
+                <p className="max-w-xl text-base text-white/70">
+                  Submit your scholarship application today. Decisions roll out weekly.
+                </p>
+              </div>
+              <Link href="/apply">
+                <Button variant="primary" size="lg">
+                  Begin application
+                  <ArrowRight size={18} className="ml-2" />
+                </Button>
+              </Link>
+            </div>
+          </Card>
+        </div>
+      </section>
     </main>
   );
 }

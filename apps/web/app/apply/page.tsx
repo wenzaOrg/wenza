@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
   Checkbox,
-  cn
+  cn,
 } from '@wenza/ui';
 import {
   ChevronLeft,
@@ -28,16 +28,22 @@ import {
   User,
   GraduationCap,
   BookOpen,
-  Send
+  Send,
+  AlertCircle,
 } from 'lucide-react';
 import Link from 'next/link';
-import { leadSubmissionSchema, type LeadSubmission, useRequest, useMutationRequest } from '@wenza/api-client';
+import {
+  leadSubmissionSchema,
+  type LeadSubmission,
+  useRequest,
+  useMutationRequest,
+} from '@wenza/api-client';
 import type { Course } from '@wenza/api-client/types';
 
 type Step = 1 | 2 | 3 | 4;
 
 const STEPS = [
-  { id: 1, title: 'Personal Details', icon: User },
+  { id: 1, title: 'Personal', icon: User },
   { id: 2, title: 'Background', icon: GraduationCap },
   { id: 3, title: 'Programme', icon: BookOpen },
   { id: 4, title: 'Review', icon: ShieldCheck },
@@ -50,9 +56,11 @@ export default function ApplyPage() {
   const [step, setStep] = React.useState<Step>(1);
   const [serverError, setServerError] = React.useState<string | null>(null);
 
-  // Fetch all courses for the dropdown
   const { data: courses } = useRequest<Course[]>('courses');
-  const { trigger, isMutating } = useMutationRequest<{ reference_code: string }, LeadSubmission>('leads');
+  const { trigger, isMutating } = useMutationRequest<
+    { reference_code: string },
+    LeadSubmission
+  >('leads');
 
   const {
     register,
@@ -87,18 +95,15 @@ export default function ApplyPage() {
 
   React.useEffect(() => {
     if (courses && courseSlug) {
-      const course = courses.find(c => c.slug === courseSlug);
-      if (course) {
-        setValue('course_id', course.id);
-      }
+      const course = courses.find((c) => c.slug === courseSlug);
+      if (course) setValue('course_id', course.id);
     }
   }, [courses, courseSlug, setValue]);
 
   const handleNext = async () => {
-    const fieldsToValidate = getFieldsForStep(step);
-    const isStepValid = await validateStep(fieldsToValidate);
-
-    if (isStepValid) {
+    const fields = getFieldsForStep(step);
+    const ok = await validateStep(fields);
+    if (ok) {
       setStep((s) => (s + 1) as Step);
       window.scrollTo(0, 0);
     }
@@ -109,8 +114,8 @@ export default function ApplyPage() {
     window.scrollTo(0, 0);
   };
 
-  const getFieldsForStep = (currentStep: Step): (keyof LeadSubmission)[] => {
-    switch (currentStep) {
+  const getFieldsForStep = (s: Step): (keyof LeadSubmission)[] => {
+    switch (s) {
       case 1: return ['full_name', 'email', 'phone', 'age', 'guardian_consent'];
       case 2: return ['employment_status', 'education_level', 'goals'];
       case 3: return ['course_id', 'wants_scholarship'];
@@ -127,108 +132,161 @@ export default function ApplyPage() {
         router.push(`/thank-you?reference=${res.data.reference_code}`);
       }
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'An unexpected error occurred. Please try again.';
-      setServerError(message);
+      setServerError(
+        err instanceof Error ? err.message : 'An unexpected error occurred. Please try again.'
+      );
     }
   };
 
-  const selectedCourse = React.useMemo(() => courses?.find(c => c.id === courseId), [courses, courseId]);
+  const selectedCourse = React.useMemo(
+    () => courses?.find((c) => c.id === courseId),
+    [courses, courseId]
+  );
 
   return (
-    <main className="min-h-screen bg-bg-dark py-12 md:py-24">
-      <div className="container max-w-2xl px-4">
-        {/* Navigation / Header */}
-        <div className="flex items-center justify-between mb-8 md:mb-12">
+    <main className="min-h-screen bg-bg-page py-12 md:py-20">
+      <div className="container mx-auto max-w-3xl px-6 md:px-20">
+        {/* Header */}
+        <div className="mb-10 flex items-center justify-between">
           <Link
             href={courseSlug ? `/courses/${courseSlug}` : '/courses'}
-            className="inline-flex items-center gap-2 text-white/40 hover:text-white transition-colors text-sm"
+            className="inline-flex items-center gap-2 text-sm font-medium text-text-muted transition-colors hover:text-primary"
           >
             <ChevronLeft size={16} />
-            <span>Abandon Application</span>
+            <span>Back</span>
           </Link>
-          <div className="text-white/40 text-sm font-medium">
-            Step {step} of 4
+          <div className="text-sm font-medium text-text-muted">
+            Step <span className="text-text-heading">{step}</span> of 4
           </div>
         </div>
 
-        <div className="space-y-4 mb-10 text-center md:text-left">
-          <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
-            Apply for Enrolment
+        <div className="mb-12 space-y-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+            Enrolment
+          </p>
+          <h1 className="font-heading text-4xl font-bold leading-tight text-text-heading md:text-5xl">
+            Apply for the next cohort
           </h1>
-          <p className="text-white/50 text-base md:text-lg">
-            Join the next cohort of world-class creators.
+          <p className="max-w-xl text-base text-text-muted md:text-lg">
+            Tell us a little about you and we’ll get back within a few business days.
           </p>
         </div>
 
-        {/* Progress Bar */}
-        <div className="mb-12" role="progressbar" aria-valuenow={step} aria-valuemin={1} aria-valuemax={4}>
-          <div className="hidden md:flex justify-between relative">
-            <div className="absolute top-1/2 left-0 w-full h-0.5 bg-white/5 -translate-y-1/2 z-0" />
+        {/* Stepper */}
+        <div
+          className="mb-12"
+          role="progressbar"
+          aria-valuenow={step}
+          aria-valuemin={1}
+          aria-valuemax={4}
+        >
+          <div className="relative hidden md:block">
+            <div className="absolute left-0 right-0 top-5 h-px bg-border" />
             <div
-              className="absolute top-1/2 left-0 h-0.5 bg-brand-primary -translate-y-1/2 z-0 transition-all duration-500 ease-in-out"
-              style={{ width: `${(step - 1) * 33.33}%` }}
+              className="absolute left-0 top-5 h-px bg-primary transition-all duration-500"
+              style={{ width: `${((step - 1) / (STEPS.length - 1)) * 100}%` }}
             />
-            {STEPS.map((s) => (
-              <div key={s.id} className="relative z-10 flex flex-col items-center gap-3">
-                <div className={cn(
-                  "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500",
-                  step >= s.id ? "bg-brand-primary text-white" : "bg-bg-dark border-2 border-white/10 text-white/20"
-                )}>
-                  {step > s.id ? <Check size={20} strokeWidth={3} /> : <s.icon size={20} />}
-                </div>
-                <span className={cn(
-                  "text-[10px] font-bold uppercase tracking-wider transition-colors duration-500",
-                  step >= s.id ? "text-white" : "text-white/20"
-                )}>
-                  {s.title}
-                </span>
-              </div>
-            ))}
+            <ol className="relative flex justify-between">
+              {STEPS.map((s) => {
+                const done = step > s.id;
+                const active = step === s.id;
+                const Icon = s.icon;
+                return (
+                  <li key={s.id} className="flex flex-col items-center gap-3">
+                    <div
+                      className={cn(
+                        'flex h-10 w-10 items-center justify-center rounded-full border bg-bg-page transition-colors',
+                        done && 'border-primary bg-primary text-white',
+                        active && 'border-primary bg-bg-card text-primary',
+                        !done && !active && 'border-border text-text-muted'
+                      )}
+                    >
+                      {done ? (
+                        <Check size={18} strokeWidth={2.5} />
+                      ) : (
+                        <Icon size={18} />
+                      )}
+                    </div>
+                    <span
+                      className={cn(
+                        'text-xs font-semibold uppercase tracking-wider',
+                        active || done ? 'text-text-heading' : 'text-text-muted'
+                      )}
+                    >
+                      {s.title}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
           </div>
-          {/* Mobile indicator handled by the "Step X of 4" above */}
+          {/* Mobile bar */}
+          <div className="md:hidden">
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-border">
+              <div
+                className="h-full bg-primary transition-all duration-500"
+                style={{ width: `${(step / 4) * 100}%` }}
+              />
+            </div>
+            <p className="mt-3 text-sm font-semibold text-text-heading">
+              {STEPS[step - 1].title}
+            </p>
+          </div>
         </div>
 
-        {/* Form Live Region */}
         <div className="sr-only" aria-live="polite">
           Step {step} of 4: {STEPS[step - 1].title}
         </div>
 
-        <Card className="p-6 md:p-10 border-white/10 bg-white/[0.02] shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-brand-primary/5 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-
-          <form className="space-y-8 relative z-10" onSubmit={handleSubmit(onSubmit)}>
-
-            {/* Step 1: Personal Details */}
+        <Card className="p-6 md:p-10">
+          <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
+            {/* Step 1 */}
             {step === 1 && (
-              <section className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <h2 className="text-xl font-bold text-white mb-6">Personal Details</h2>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <FormField label="Full Name" name="full_name" error={errors.full_name?.message}>
+              <section className="space-y-6">
+                <div>
+                  <h2 className="font-heading text-2xl font-bold text-text-heading">
+                    Personal details
+                  </h2>
+                  <p className="mt-1 text-sm text-text-muted">
+                    How can we reach you?
+                  </p>
+                </div>
+                <div className="grid gap-6 md:grid-cols-2">
+                  <FormField
+                    label="Full name"
+                    name="full_name"
+                    error={errors.full_name?.message}
+                  >
                     <Input
                       {...register('full_name')}
                       id="full_name"
-                      placeholder="e.g. John Doe"
-                      className="bg-white/5 border-white/10 h-12"
+                      placeholder="e.g. Adewale Bakare"
                       autoFocus
                     />
                   </FormField>
-                  <FormField label="Email Address" name="email" error={errors.email?.message}>
+                  <FormField
+                    label="Email address"
+                    name="email"
+                    error={errors.email?.message}
+                  >
                     <Input
                       {...register('email')}
                       id="email"
                       type="email"
-                      placeholder="john@example.com"
-                      className="bg-white/5 border-white/10 h-12"
+                      placeholder="you@example.com"
                     />
                   </FormField>
                 </div>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <FormField label="Phone Number" name="phone" error={errors.phone?.message}>
+                <div className="grid gap-6 md:grid-cols-2">
+                  <FormField
+                    label="Phone number"
+                    name="phone"
+                    error={errors.phone?.message}
+                  >
                     <Input
                       {...register('phone')}
                       id="phone"
                       placeholder="08012345678"
-                      className="bg-white/5 border-white/10 h-12"
                     />
                   </FormField>
                   <FormField label="Age" name="age" error={errors.age?.message}>
@@ -237,59 +295,81 @@ export default function ApplyPage() {
                       id="age"
                       type="text"
                       placeholder="25"
-                      className="bg-white/5 border-white/10 h-12"
                       onKeyPress={(e) => {
-                        const charCode = e.which;
-                        if (charCode < 48 || charCode > 57) {
-                          e.preventDefault();
-                        }
+                        if (e.which < 48 || e.which > 57) e.preventDefault();
                       }}
                     />
                   </FormField>
                 </div>
 
                 {age && age < 18 && (
-                  <div className="p-5 rounded-xl border border-warning/20 bg-warning/5 animate-in zoom-in-95 duration-300">
-                    <p className="text-sm text-warning mb-4 leading-relaxed font-medium">
-                      You are under 18. We require confirmation that you have permission from a parent or guardian to enrol.
-                    </p>
-                    <div className="flex items-start gap-3">
-                      <Controller
-                        name="guardian_consent"
-                        control={control}
-                        render={({ field }) => (
-                          <Checkbox
-                            id="guardian_consent"
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            className="mt-1"
-                          />
-                        )}
-                      />
-                      <label htmlFor="guardian_consent" className="text-sm text-white/70 cursor-pointer select-none">
-                        I confirm I have guardian consent to apply
-                      </label>
+                  <div className="flex gap-3 rounded-card border border-primary/20 bg-primary/5 p-5">
+                    <AlertCircle
+                      className="mt-0.5 shrink-0 text-primary"
+                      size={20}
+                    />
+                    <div className="space-y-3">
+                      <p className="text-sm leading-relaxed text-text-body">
+                        You are under 18. We require confirmation that you have
+                        permission from a parent or guardian to enrol.
+                      </p>
+                      <div className="flex items-start gap-3">
+                        <Controller
+                          name="guardian_consent"
+                          control={control}
+                          render={({ field }) => (
+                            <Checkbox
+                              id="guardian_consent"
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              className="mt-0.5"
+                            />
+                          )}
+                        />
+                        <label
+                          htmlFor="guardian_consent"
+                          className="cursor-pointer select-none text-sm text-text-body"
+                        >
+                          I confirm I have guardian consent to apply
+                        </label>
+                      </div>
+                      {errors.guardian_consent && (
+                        <p className="text-xs text-error">
+                          {errors.guardian_consent.message}
+                        </p>
+                      )}
                     </div>
-                    {errors.guardian_consent && (
-                      <p className="text-xs text-error mt-2">{errors.guardian_consent.message}</p>
-                    )}
                   </div>
                 )}
               </section>
             )}
 
-            {/* Step 2: Background */}
+            {/* Step 2 */}
             {step === 2 && (
-              <section className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
-                <h2 className="text-xl font-bold text-white mb-6">Your Background</h2>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <FormField label="Employment Status" name="employment_status" error={errors.employment_status?.message}>
+              <section className="space-y-6">
+                <div>
+                  <h2 className="font-heading text-2xl font-bold text-text-heading">
+                    Your background
+                  </h2>
+                  <p className="mt-1 text-sm text-text-muted">
+                    Helps us tailor your learning path.
+                  </p>
+                </div>
+                <div className="grid gap-6 md:grid-cols-2">
+                  <FormField
+                    label="Employment status"
+                    name="employment_status"
+                    error={errors.employment_status?.message}
+                  >
                     <Controller
                       name="employment_status"
                       control={control}
                       render={({ field }) => (
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger id="employment_status" className="bg-white/5 border-white/10 h-12" error={!!errors.employment_status}>
+                          <SelectTrigger
+                            id="employment_status"
+                            error={!!errors.employment_status}
+                          >
                             <SelectValue placeholder="Select status" />
                           </SelectTrigger>
                           <SelectContent>
@@ -303,13 +383,20 @@ export default function ApplyPage() {
                       )}
                     />
                   </FormField>
-                  <FormField label="Highest Education" name="education_level" error={errors.education_level?.message}>
+                  <FormField
+                    label="Highest education"
+                    name="education_level"
+                    error={errors.education_level?.message}
+                  >
                     <Controller
                       name="education_level"
                       control={control}
                       render={({ field }) => (
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger id="education_level" className="bg-white/5 border-white/10 h-12" error={!!errors.education_level}>
+                          <SelectTrigger
+                            id="education_level"
+                            error={!!errors.education_level}
+                          >
                             <SelectValue placeholder="Select level" />
                           </SelectTrigger>
                           <SelectContent>
@@ -335,32 +422,51 @@ export default function ApplyPage() {
                   <Textarea
                     {...register('goals')}
                     id="goals"
-                    placeholder="Tell us about your professional goals and how this programme helps you achieve them..."
-                    className="bg-white/5 border-white/10 min-h-[160px] resize-none pt-4"
+                    placeholder="Tell us about your professional goals and how this programme helps you achieve them…"
+                    className="min-h-[160px] resize-none"
                   />
                 </FormField>
               </section>
             )}
 
-            {/* Step 3: Programme Choice */}
+            {/* Step 3 */}
             {step === 3 && (
-              <section className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
-                <h2 className="text-xl font-bold text-white mb-6">Choose Your Path</h2>
-                <FormField label="Selected Programme" name="course_id" error={errors.course_id?.message}>
+              <section className="space-y-6">
+                <div>
+                  <h2 className="font-heading text-2xl font-bold text-text-heading">
+                    Choose your programme
+                  </h2>
+                  <p className="mt-1 text-sm text-text-muted">
+                    Pick the track you want to start with.
+                  </p>
+                </div>
+                <FormField
+                  label="Selected programme"
+                  name="course_id"
+                  error={errors.course_id?.message}
+                >
                   <Controller
                     name="course_id"
                     control={control}
                     render={({ field }) => (
                       <Select
-                        onValueChange={(val) => field.onChange(val ? parseInt(val) : undefined)}
-                        value={field.value?.toString() || ""}
+                        onValueChange={(val) =>
+                          field.onChange(val ? parseInt(val) : undefined)
+                        }
+                        value={field.value?.toString() || ''}
                       >
-                        <SelectTrigger id="course_id" className="bg-white/5 border-white/10 h-14" error={!!errors.course_id}>
+                        <SelectTrigger
+                          id="course_id"
+                          error={!!errors.course_id}
+                        >
                           <SelectValue placeholder="Select a programme" />
                         </SelectTrigger>
                         <SelectContent>
-                          {courses?.map(course => (
-                            <SelectItem key={course.id} value={course.id.toString()}>
+                          {courses?.map((course) => (
+                            <SelectItem
+                              key={course.id}
+                              value={course.id.toString()}
+                            >
                               {course.title}
                             </SelectItem>
                           ))}
@@ -370,10 +476,14 @@ export default function ApplyPage() {
                   />
                 </FormField>
 
-                <div className="flex items-center justify-between p-6 rounded-2xl border border-white/5 bg-white/[0.01]">
+                <div className="flex items-start justify-between gap-4 rounded-card border border-border bg-bg-card p-5">
                   <div className="space-y-1">
-                    <p className="text-white font-bold">Apply for Scholarship</p>
-                    <p className="text-xs text-white/40">Check this if you require financial assistance.</p>
+                    <p className="font-semibold text-text-heading">
+                      Apply for scholarship
+                    </p>
+                    <p className="text-sm text-text-muted">
+                      Check this if you require financial assistance.
+                    </p>
                   </div>
                   <Controller
                     name="wants_scholarship"
@@ -382,7 +492,7 @@ export default function ApplyPage() {
                       <Checkbox
                         checked={field.value}
                         onCheckedChange={field.onChange}
-                        className="h-6 w-6"
+                        className="mt-1 h-5 w-5"
                       />
                     )}
                   />
@@ -390,50 +500,71 @@ export default function ApplyPage() {
               </section>
             )}
 
-            {/* Step 4: Review & Submit */}
+            {/* Step 4 */}
             {step === 4 && (
-              <section className="space-y-8 animate-in fade-in zoom-in-95 duration-500">
-                <h2 className="text-xl font-bold text-white mb-6">Final Review</h2>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <ReviewItem label="Name" value={watch('full_name')} />
-                  <ReviewItem label="Email" value={watch('email')} />
-                  <ReviewItem label="Programme" value={selectedCourse?.title || 'General Application'} />
-                  <ReviewItem label="Scholarship" value={wantsScholarship ? 'Yes' : 'No'} />
+              <section className="space-y-8">
+                <div>
+                  <h2 className="font-heading text-2xl font-bold text-text-heading">
+                    Review &amp; submit
+                  </h2>
+                  <p className="mt-1 text-sm text-text-muted">
+                    Quick check before we send it through.
+                  </p>
                 </div>
 
-                <div className="space-y-4">
-                  <p className="text-xs font-bold text-white/30 uppercase tracking-widest">Security Check</p>
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                  <ReviewItem label="Name" value={watch('full_name')} />
+                  <ReviewItem label="Email" value={watch('email')} />
+                  <ReviewItem
+                    label="Programme"
+                    value={selectedCourse?.title || 'General application'}
+                  />
+                  <ReviewItem
+                    label="Scholarship"
+                    value={wantsScholarship ? 'Yes' : 'No'}
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-muted">
+                    Security check
+                  </p>
                   <div className="flex justify-center md:justify-start">
                     <Turnstile
                       siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
-                      onSuccess={(token) => setValue('turnstile_token', token, { shouldValidate: true })}
-                      options={{ theme: 'dark' }}
+                      onSuccess={(token) =>
+                        setValue('turnstile_token', token, { shouldValidate: true })
+                      }
                     />
                   </div>
                   {errors.turnstile_token && (
-                    <p className="text-sm text-error font-medium">{errors.turnstile_token.message}</p>
+                    <p className="text-sm font-medium text-error">
+                      {errors.turnstile_token.message}
+                    </p>
                   )}
                 </div>
 
                 {serverError && (
-                  <div className="p-4 rounded-xl border border-error/20 bg-error/5 text-error text-sm font-medium animate-in shake duration-500">
-                    {serverError}
+                  <div className="flex items-start gap-3 rounded-card border border-error/30 bg-error/5 p-4 text-sm font-medium text-error">
+                    <AlertCircle size={18} className="mt-0.5 shrink-0" />
+                    <span>{serverError}</span>
                   </div>
                 )}
               </section>
             )}
 
-            {/* Navigation Buttons */}
-            <div className="flex flex-col-reverse md:flex-row gap-4 pt-8">
+            {/* Nav */}
+            <div className="flex flex-col-reverse gap-3 border-t border-border pt-6 md:flex-row">
               {step > 1 && (
                 <Button
                   type="button"
-                  variant="secondary"
+                  variant="outline"
+                  size="lg"
                   onClick={handleBack}
-                  className="flex-1 h-14 text-base"
+                  className="md:w-32"
                   disabled={isMutating}
                 >
+                  <ChevronLeft size={18} className="mr-1" />
                   Back
                 </Button>
               )}
@@ -442,22 +573,31 @@ export default function ApplyPage() {
                 <Button
                   type="button"
                   variant="primary"
+                  size="lg"
                   onClick={handleNext}
-                  className={cn("flex-1 h-14 text-base", step === 1 && "w-full")}
+                  className="flex-1"
                 >
-                  Continue <ChevronRight className="ml-2 h-5 w-5" />
+                  Continue
+                  <ChevronRight size={18} className="ml-1" />
                 </Button>
               ) : (
                 <Button
                   type="submit"
                   variant="primary"
-                  className="flex-1 h-14 text-base font-bold shadow-xl shadow-brand-primary/20"
+                  size="lg"
+                  className="flex-1"
                   disabled={isMutating || !isValid}
                 >
                   {isMutating ? (
-                    <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Submitting...</>
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Submitting…
+                    </>
                   ) : (
-                    <><Send className="mr-2 h-5 w-5" /> Submit Application</>
+                    <>
+                      <Send className="mr-2 h-5 w-5" />
+                      Submit application
+                    </>
                   )}
                 </Button>
               )}
@@ -465,28 +605,38 @@ export default function ApplyPage() {
           </form>
         </Card>
 
-        {/* Footer info */}
-        <p className="text-center text-white/20 text-xs mt-12 leading-relaxed max-w-md mx-auto">
+        <p className="mx-auto mt-10 max-w-md text-center text-xs leading-relaxed text-text-muted">
           By submitting this application, you agree to our{' '}
-          <Link href="/terms" className="underline hover:text-primary transition-colors">
+          <Link href="/terms" className="text-primary hover:underline">
             Terms of Service
           </Link>{' '}
           and{' '}
-          <Link href="/privacy" className="underline hover:text-primary transition-colors">
+          <Link href="/privacy" className="text-primary hover:underline">
             Privacy Policy
-          </Link>.
-          Your personal information will be handled in accordance with our privacy practices.
+          </Link>
+          . Your personal information will be handled in accordance with our privacy
+          practices.
         </p>
       </div>
     </main>
   );
 }
 
-function ReviewItem({ label, value }: { label: string, value: string | undefined }) {
+function ReviewItem({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | undefined;
+}) {
   return (
-    <div className="p-4 rounded-xl border border-white/5 bg-white/[0.01]">
-      <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1">{label}</p>
-      <p className="text-sm text-white font-medium truncate">{value || 'N/A'}</p>
+    <div className="rounded-card border border-border bg-bg-card p-4">
+      <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-text-muted">
+        {label}
+      </p>
+      <p className="truncate text-sm font-medium text-text-heading">
+        {value || 'N/A'}
+      </p>
     </div>
   );
 }

@@ -14,6 +14,7 @@ export interface CourseCardProps {
     duration_weeks: number;
     format: string;
     price_ngn: number;
+    thumbnail_url?: string;
   };
 }
 
@@ -34,7 +35,14 @@ export function CourseCard({ course }: CourseCardProps) {
     >
       <Card variant="elevated" className="h-full flex flex-col group-hover:-translate-y-1 transition-transform duration-300">
         {/* Top Banner Accent */}
-        <div className="h-32 bg-primary/10 transition-colors group-hover:bg-primary/20 shrink-0" />
+        <div className="h-32 relative overflow-hidden shrink-0">
+          <img
+            src={course.thumbnail_url || `/assets/images/courses/${course.category}.png`}
+            alt={course.title}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          />
+          <div className="absolute inset-0 bg-primary/10 transition-colors group-hover:bg-transparent" />
+        </div>
         
         <CardContent className="flex flex-1 flex-col pt-6">
           <div className="mb-4">

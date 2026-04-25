@@ -7,18 +7,19 @@ import { Button } from './button';
 import { focusRing } from '../lib/classes';
 import { cn } from '../lib/utils';
 
-const getSiteUrl = () => {
-  if (typeof window === 'undefined') return process.env.NEXT_PUBLIC_MAIN_SITE_URL || '';
-  return process.env.NEXT_PUBLIC_MAIN_SITE_URL || '';
-};
-
-const MAIN_SITE_URL = getSiteUrl();
+const MAIN_SITE_URL = process.env.NEXT_PUBLIC_MAIN_SITE_URL || '';
 
 const NAV_LINKS = [
   { label: 'Programmes', href: `${MAIN_SITE_URL}/courses` },
   { label: 'Mentors', href: `${MAIN_SITE_URL}/mentors` },
-  { label: 'Scholarship', href: process.env.NEXT_PUBLIC_SCHOLARSHIP_URL || 'https://scholarship.wenza.com' },
+  {
+    label: 'Scholarship',
+    href:
+      process.env.NEXT_PUBLIC_SCHOLARSHIP_URL ||
+      'https://scholarship.wenza.com',
+  },
   { label: 'About', href: `${MAIN_SITE_URL}/about` },
+  { label: 'Contact', href: `${MAIN_SITE_URL}/contact` },
 ];
 
 export function Navbar() {
@@ -26,45 +27,58 @@ export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
   React.useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => setIsScrolled(window.scrollY > 16);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const loginUrl = process.env.NEXT_PUBLIC_APP_URL ? `${process.env.NEXT_PUBLIC_APP_URL}/login` : '/login';
+  React.useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
+
+  const loginUrl = process.env.NEXT_PUBLIC_APP_URL
+    ? `${process.env.NEXT_PUBLIC_APP_URL}/login`
+    : '/login';
 
   return (
     <header
       style={{ '--nav-height': '72px' } as React.CSSProperties}
       className={cn(
-        'fixed top-0 z-50 w-full transition-all duration-300',
-        isScrolled ? 'bg-bg-card shadow-card' : 'bg-transparent'
+        'fixed top-0 z-50 w-full transition-all duration-200',
+        isScrolled
+          ? 'border-b border-border bg-bg-page/95 backdrop-blur-md'
+          : 'border-b border-transparent bg-bg-page'
       )}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-8">
+      <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-6 md:px-20">
+        {/* Brand */}
         <Link
           href="/"
           className={cn(
-            'font-heading text-2xl font-bold transition-colors',
-            focusRing,
-            isScrolled ? 'text-text-heading' : 'text-white'
+            'font-heading text-2xl font-bold text-text-heading transition-colors hover:text-primary',
+            focusRing
           )}
         >
-          Wenza.
+          Wenza<span className="text-primary">.</span>
         </Link>
 
-        {/* Desktop Nav */}
-        <nav className="hidden items-center gap-6 md:flex">
+        {/* Desktop nav */}
+        <nav className="hidden items-center gap-8 md:flex">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.label}
               href={link.href}
               className={cn(
-                'text-sm font-medium transition-colors',
-                focusRing,
-                isScrolled
-                  ? 'text-text-body hover:text-primary'
-                  : 'text-white/90 hover:text-white'
+                'text-sm font-medium text-text-body transition-colors hover:text-primary',
+                focusRing
               )}
             >
               {link.label}
@@ -72,64 +86,66 @@ export function Navbar() {
           ))}
         </nav>
 
-        {/* Desktop Actions */}
-        <div className="hidden items-center gap-4 md:flex">
-          <Button variant="ghost" asChild>
-            <Link href={loginUrl}>
-              Sign in
-            </Link>
+        {/* Desktop actions */}
+        <div className="hidden items-center gap-3 md:flex">
+          <Button variant="ghost" size="sm" asChild>
+            <Link href={loginUrl}>Sign in</Link>
           </Button>
-          <Button variant="primary" asChild>
-            <Link href="/apply">
-              Apply Now
-            </Link>
+          <Button variant="primary" size="sm" asChild>
+            <Link href="/apply">Apply now</Link>
           </Button>
         </div>
 
-        {/* Mobile Hamburger toggle */}
+        {/* Mobile toggle */}
         <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          onClick={() => setIsMobileMenuOpen((v) => !v)}
           className={cn(
-            'transition-colors md:hidden',
-            focusRing,
-            isScrolled ? 'text-text-heading' : 'text-white'
+            'flex h-10 w-10 items-center justify-center rounded-button text-text-heading transition-colors hover:bg-bg-card md:hidden',
+            focusRing
           )}
           aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={isMobileMenuOpen}
         >
-          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
       </div>
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile overlay */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 top-[var(--nav-height)] z-40 bg-bg-card px-4 py-6 shadow-xl md:hidden">
-          <nav className="flex flex-col gap-6">
+        <div className="fixed inset-0 top-[72px] z-40 flex flex-col bg-bg-page md:hidden">
+          <nav className="flex flex-col px-6 py-4">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.label}
                 href={link.href}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={cn(
-                  'text-lg font-medium text-text-body transition-colors hover:text-primary',
+                  'border-b border-border py-4 text-base font-medium text-text-heading transition-colors hover:text-primary',
                   focusRing
                 )}
               >
                 {link.label}
               </Link>
             ))}
-            <div className="mt-4 flex flex-col gap-4 border-t border-border pt-6">
-              <Button variant="ghost" className="w-full text-lg" asChild>
-                <Link href={loginUrl} onClick={() => setIsMobileMenuOpen(false)}>
-                  Sign in
-                </Link>
-              </Button>
-              <Button variant="primary" size="lg" className="w-full text-lg" asChild>
-                <Link href="/apply" onClick={() => setIsMobileMenuOpen(false)}>
-                  Apply Now
-                </Link>
-              </Button>
-            </div>
           </nav>
+          <div className="mt-auto flex flex-col gap-3 border-t border-border bg-bg-card px-6 py-4">
+            <Button variant="outline" size="lg" className="w-full" asChild>
+              <Link
+                href={loginUrl}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Sign in
+              </Link>
+            </Button>
+            <Button variant="primary" size="lg" className="w-full" asChild>
+              <Link
+                href="/apply"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Apply now
+              </Link>
+            </Button>
+          </div>
         </div>
       )}
     </header>
